@@ -94,29 +94,6 @@ class ImageUtils:
         return Settings.window_left, Settings.window_top, Settings.window_width, Settings.window_height
 
     @staticmethod
-    def get_captcha_img():
-        from shutil import copyfile
-        from time import strftime, localtime
-        date_tag = strftime('%H_%M',localtime())
-        header_center_post = ImageUtils.find_button("captcha_header")
-        #copyfile("temp/match.png", "temp/match_%s.png" % date_tag)
-        MessageLog.print_message(f"{header_center_post[0]}   {header_center_post[1]}")
-        top_left = (header_center_post[0]-65-Settings.window_left,header_center_post[1]+118-Settings.window_top)
-        bottom_right = (header_center_post[0]+64-Settings.window_left,header_center_post[1]+167-Settings.window_top)
-        print(top_left)
-        print(bottom_right)
-        captcha_img = cv2.imread("temp/source.png")
-        #copyfile("temp/source.png", "temp/source_%s.png" % date_tag)
-        cropped = captcha_img[top_left[1]:bottom_right[1], top_left[0]:bottom_right[0]]
-        cv2.imwrite("temp/captcha.png", cropped)
-        #copyfile("temp/captcha.png", "temp/captcha%s.png" % date_tag)
-        
-    @staticmethod  
-    def save_captcha_img(code):
-        from shutil import copyfile
-        copyfile("temp/captcha.png", "temp/captcha_%s.png" % code)
-
-    @staticmethod
     def _take_screenshot() -> numpy.ndarray:
         """截取遊戲視窗區域，回傳灰階影像，並更新截圖像素/邏輯座標比例。
 

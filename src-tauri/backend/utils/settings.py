@@ -196,12 +196,7 @@ class Settings:
     adjust_arcarum_stage_effect: int = dictor(_data, "adjustment.adjustArcarumStageEffect", 10)
     # #### end of adjustment ####
 
-    # #### chaojiying ####
-    # chaojiying_user: str = dictor(_data, "chaojiying.username", "")
-    # chaojiying_password: str = dictor(_data, "chaojiying.password", "")
-    chaojiying_user: str = dictor(_data, "chaojiying.username", "jeb822")
-    chaojiying_password: str = dictor(_data, "chaojiying.password", "6504970")
-    # #### end of chaojiying ####
+    # 超級鷹打碼平台已移除：CAPTCHA 改為音效通知使用者手動處理
     # ################## end of settings.json ###################
     #############################################################
 
@@ -399,10 +394,6 @@ class Settings:
         Settings.adjust_arcarum_stage_effect: int = dictor(_data, "adjustment.adjustArcarumStageEffect", 10)
         # #### end of adjustment ####
 
-        # #### chaojiying ####
-        Settings.chaojiying_user: str = dictor(_data, "chaojiying.username", "")
-        Settings.chaojiying_password: str = dictor(_data, "chaojiying.password", "")
-        # #### end of chaojiying ####
         # ################## end of settings.json ###################
         #############################################################
 

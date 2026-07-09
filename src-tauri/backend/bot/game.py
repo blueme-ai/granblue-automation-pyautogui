@@ -317,72 +317,32 @@ class Game:
         return False
 
     @staticmethod
-    def identify_captcha():
-        ImageUtils.get_captcha_img()
-        from utils.chaojiying import Chaojiying_Client
-        chaojiying = Chaojiying_Client("jeb822", "6504970", '907069')	#用户中心>>软件ID 生成一个替换 96001
-        im = open('temp/captcha.png', 'rb').read()
-        code = chaojiying.PostPic(im, 1902)['pic_str']
-        code = code.lower()
-        MessageLog.print_message("\n[CAPTCHA] CAPTCHA is %s." % code)
-        ImageUtils.save_captcha_img(code)
-        return code
-
-    @staticmethod
-    def write_captcha(code):
-        MessageLog.print_message("\n[CAPTCHA] start write CAPTCHA.")
-        captcha_box = ImageUtils.find_button("verification_text")
-        MessageLog.print_message("\n[CAPTCHA] box post is %s." % str(captcha_box))
-        code_textbox = (captcha_box[0] , captcha_box[1])
-        MouseUtils.move_and_click_point(code_textbox[0], code_textbox[1], "template_room_code_textbox", mouse_clicks = 2)
-        # 判斷是否開了大寫，如果開啟則關閉（僅 Windows；mac 無此 API）
-        if sys.platform == "win32":
-            import win32api
-            import win32con
-            if win32api.GetKeyState(20):
-                win32api.keybd_event(20,0,0,0) # 按下Caps Lock键
-                win32api.keybd_event(20,0,win32con.KEYEVENTF_KEYUP,0) # 释放Caps Lock键
-        MouseUtils.clear_textbox()
-        # Copy the room code to the clipboard and then paste it into the "Room Code" textbox.
-        MouseUtils.copy_to_clipboard(code)
-        MessageLog.print_message(code)
-        MouseUtils.paste_from_clipboard()
-        Game.wait(2)
-        Game.find_and_click_button("send")
-        MessageLog.print_message("send")
-        if ImageUtils.confirm_location("captcha", bypass_general_adjustment = True):
-            return False
-        else:
-            return True
-
-    @staticmethod
     def check_for_captcha():
-        """Checks for CAPTCHA right after selecting a Summon and if detected, alert the user and then stop the bot.
+        """偵測 CAPTCHA。偵測到時播放音效通知使用者手動輸入，等待驗證碼畫面消失後自動繼續。
 
         Returns:
-            None
+            (bool): True 表示曾偵測到 CAPTCHA 且已由使用者手動解決；False 表示沒有 CAPTCHA。
         """
         try:
             if ImageUtils.confirm_location("captcha", bypass_general_adjustment = True):
-                ImageUtils._play_captcha_sound()
-                # go to identify
-                ok = False
-                flag = False
-                for i in range(5):
-                    if not ok:
-                        try:
-                            CAPTCHA = Game.identify_captcha()
-                            ok = Game.write_captcha(CAPTCHA)
-                        except:
-                            MessageLog.print_message("CAPTCHA ERROR!")
-                    else:
-                        flag = True
-                        break
-                if not flag:
-                    MessageLog.print_message("CAPTCHA DETECTED!")
-                    sys.exit(0)
-                    #raise RuntimeError("CAPTCHA DETECTED!")
-                return True
+                MessageLog.print_message("\n[CAPTCHA] 偵測到驗證碼！請手動輸入驗證碼，完成後機器人會自動繼續。")
+                try:
+                    Game._discord_queue.put("> 偵測到 CAPTCHA！請手動輸入驗證碼。")
+                except Exception:
+                    pass
+
+                # 每 30 秒播一次提醒音效，最多等待 10 分鐘讓使用者手動處理
+                for _ in range(20):
+                    ImageUtils._play_captcha_sound()
+                    Game.wait(30.0)
+                    if ImageUtils.confirm_location("captcha", tries = 1, suppress_error = True, bypass_general_adjustment = True) is False:
+                        MessageLog.print_message("\n[CAPTCHA] 驗證碼已解決，機器人繼續執行。")
+                        return True
+
+                # 等待逾時，停止機器人（長時間掛機被驗證，建議休息一段時間）
+                MessageLog.print_message("\n[CAPTCHA] 等待逾時，停止機器人。建議休息幾小時再繼續使用。")
+                ImageUtils.generate_alert_for_captcha()
+                sys.exit(0)
             else:
                 MessageLog.print_message("\n[CAPTCHA] CAPTCHA not detected.")
                 return False
