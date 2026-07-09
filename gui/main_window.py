@@ -67,6 +67,9 @@ class MainWindow(QWidget):
 
         # 右上角語言切換
         top_bar = QHBoxLayout()
+        self.help_button = QPushButton()
+        self.help_button.clicked.connect(self._show_help)
+        top_bar.addWidget(self.help_button)
         top_bar.addStretch()
         self.lang_label = QLabel()
         self.lang_combo = QComboBox()
@@ -90,19 +93,34 @@ class MainWindow(QWidget):
         self.mode_combo = QComboBox()
         for zh_name in self.gamemode_dict.keys():
             self.mode_combo.addItem(zh_name, zh_name)
+        self.mode_combo.currentIndexChanged.connect(self._on_mode_changed)
+        self.mission_label = QLabel()
+        self.mission_combo = QComboBox()
+        self.mission_combo.currentIndexChanged.connect(self._on_mission_changed)
+        self.item_label = QLabel()
+        self.item_combo = QComboBox()
+        form_row.addWidget(self.mode_label)
+        form_row.addWidget(self.mode_combo, 1)
+        form_row.addWidget(self.mission_label)
+        form_row.addWidget(self.mission_combo, 2)
+        form_row.addWidget(self.item_label)
+        form_row.addWidget(self.item_combo, 1)
+        task_layout.addLayout(form_row)
+
+        form_row2 = QHBoxLayout()
         self.script_label = QLabel()
         self.script_combo = QComboBox()
         self._populate_scripts()
         self.count_label = QLabel()
         self.count_spin = QSpinBox()
         self.count_spin.setRange(1, 9999)
-        form_row.addWidget(self.mode_label)
-        form_row.addWidget(self.mode_combo, 2)
-        form_row.addWidget(self.script_label)
-        form_row.addWidget(self.script_combo, 2)
-        form_row.addWidget(self.count_label)
-        form_row.addWidget(self.count_spin)
-        task_layout.addLayout(form_row)
+        form_row2.addWidget(self.script_label)
+        form_row2.addWidget(self.script_combo, 2)
+        form_row2.addWidget(self.count_label)
+        form_row2.addWidget(self.count_spin)
+        form_row2.addStretch()
+        task_layout.addLayout(form_row2)
+        self._on_mode_changed()
 
         button_row = QHBoxLayout()
         self.add_button = QPushButton()
@@ -188,7 +206,7 @@ class MainWindow(QWidget):
         run_grid.addLayout(row)
         row = QHBoxLayout()
         self.rest_check = QCheckBox()
-        self.rest_check.setChecked(True)
+        self.rest_check.setChecked(False)
         row.addWidget(self.rest_check)
         row.addStretch()
         run_grid.addLayout(row)
@@ -269,8 +287,11 @@ class MainWindow(QWidget):
         self.tabs.setTabText(1, tr("設定"))
 
         self.mode_label.setText(tr("遊戲模式"))
+        self.mission_label.setText(tr("關卡"))
+        self.item_label.setText(tr("目標道具"))
         self.script_label.setText(tr("戰鬥腳本"))
         self.count_label.setText(tr("次數"))
+        self.help_button.setText(tr("使用說明"))
         self.add_button.setText(tr("新增任務"))
         self.break_button.setText(tr("新增休息"))
         self.break_unit_label.setText(tr("分鐘"))
@@ -318,6 +339,25 @@ class MainWindow(QWidget):
 
     # ---------- 任務管理 ----------
 
+    def _on_mode_changed(self):
+        """依所選模式重新填入關卡清單。"""
+        self.mission_combo.blockSignals(True)
+        self.mission_combo.clear()
+        mode = self.mode_combo.currentData()
+        for mission_name in self.gamemode_dict.get(mode, {}).keys():
+            self.mission_combo.addItem(mission_name, mission_name)
+        self.mission_combo.blockSignals(False)
+        self._on_mission_changed()
+
+    def _on_mission_changed(self):
+        """依所選關卡重新填入目標道具清單。"""
+        self.item_combo.clear()
+        mode = self.mode_combo.currentData()
+        mission = self.mission_combo.currentData()
+        info = self.gamemode_dict.get(mode, {}).get(mission, {})
+        for item in info.get("items", ["Repeated Runs"]):
+            self.item_combo.addItem(item, item)
+
     def _populate_scripts(self):
         self.script_combo.clear()
         if os.path.isdir(_SCRIPTS_DIR):
@@ -333,8 +373,14 @@ class MainWindow(QWidget):
         mode = task["mode"]
         if i18n.current_language == "en":
             mode = self.translate_dict.get(mode, mode)
+        mission = task.get("mission", "")
         script = (task["script"] or "").replace(".txt", "")
-        return f"{mode} | {script} | {task['count']} {tr('次')}"
+        parts = [mode]
+        if mission:
+            parts.append(mission)
+        parts.append(script)
+        parts.append(f"{task['count']} {tr('次')}")
+        return " | ".join(parts)
 
     def _refresh_task_list(self):
         self.task_list.clear()
@@ -350,8 +396,14 @@ class MainWindow(QWidget):
         if not os.path.isfile(script_path):
             QMessageBox.warning(self, tr("錯誤"), tr("腳本檔不存在或無法讀取：") + script)
             return
+        mode = self.mode_combo.currentData()
+        mission = self.mission_combo.currentData() or ""
+        info = self.gamemode_dict.get(mode, {}).get(mission, {})
         self.tasks.append({
-            "mode": self.mode_combo.currentData(),
+            "mode": mode,
+            "mission": mission,
+            "map": info.get("map", ""),
+            "item": self.item_combo.currentData() or "Repeated Runs",
             "script": script,
             "count": self.count_spin.value(),
         })
@@ -429,10 +481,33 @@ class MainWindow(QWidget):
                 QMessageBox.warning(self, tr("錯誤"), tr("腳本檔不存在或無法讀取：") + task["script"])
                 return
             farming_mode = self.translate_dict.get(task["mode"], task["mode"])
-            settings_list.append(build_settings(farming_mode, task["count"], task["script"], script_lines, options))
+            mission = self.translate_dict.get(task.get("mission", ""), task.get("mission", ""))
+            settings_list.append(build_settings(
+                farming_mode, task["count"], task["script"], script_lines, options,
+                mission = mission, map_name = task.get("map", ""), item = task.get("item", "Repeated Runs")))
 
         self.start_button.setText(tr("停止"))
         self.runner.start(settings_list)
+
+    def _show_help(self):
+        QMessageBox.information(self, tr("使用說明"), tr(
+            "【使用前準備】\n"
+            "1. 用瀏覽器開啟碧藍幻想，視窗保持可見（不要縮小）\n"
+            "2. 遊戲畫面停在「首頁」（看得到底部的 Home 按鈕）\n"
+            "3. 遊戲內開啟兩個 Auto Restore 設定\n"
+            "\n"
+            "【操作步驟】\n"
+            "1. 選遊戲模式 → 關卡 → 目標道具\n"
+            "2. 選戰鬥腳本（full_auto 適合大多數情況）\n"
+            "3. 設定次數，按「新增任務」\n"
+            "4. 可以加多個任務、拖曳排序、插入休息時段\n"
+            "5. 按「開始」，機器人會自動校準螢幕並依序執行\n"
+            "\n"
+            "【注意事項】\n"
+            "• 執行中不要動滑鼠鍵盤（靜態視窗模式下不能移動遊戲視窗）\n"
+            "• 出現驗證碼會播音效提醒，請手動輸入，完成後自動繼續\n"
+            "• 長時間掛機有封號風險，建議搭配休息時段\n"
+            "• 設定分頁可調整滑鼠模擬、執行間隔等進階選項"))
 
     def _append_log(self, line: str):
         self.log_view.appendPlainText(line)

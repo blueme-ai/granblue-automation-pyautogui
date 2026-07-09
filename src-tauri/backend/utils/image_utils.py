@@ -94,8 +94,10 @@ class ImageUtils:
         return Settings.window_left, Settings.window_top, Settings.window_width, Settings.window_height
 
     @staticmethod
-    def _take_screenshot() -> numpy.ndarray:
+    def _grab_screen() -> numpy.ndarray:
         """截取遊戲視窗區域，回傳灰階影像，並更新截圖像素/邏輯座標比例。
+
+        注意：不可命名為 _take_screenshot，該名稱已被戰利品截圖功能使用。
 
         Returns:
             (numpy.ndarray): 灰階截圖。
@@ -140,7 +142,7 @@ class ImageUtils:
             MessageLog.print_message("[WARNING] 找不到 home 按鈕模板圖，略過縮放偵測。")
             return ImageUtils._template_scale
 
-        src = ImageUtils._take_screenshot()
+        src = ImageUtils._grab_screen()
         h, w = template.shape
 
         best_scale = 1.0
@@ -191,7 +193,7 @@ class ImageUtils:
             (bool): True if the template was found inside the source image and False otherwise.
         """
         match_check = False
-        src: numpy.ndarray = ImageUtils._take_screenshot()
+        src: numpy.ndarray = ImageUtils._grab_screen()
         template = ImageUtils._scaled_template(template)
         height, width = template.shape
 
@@ -247,7 +249,7 @@ class ImageUtils:
         Returns:
             (List[Tuple[int, ...]]): List of Tuples containing match locations.
         """
-        src: numpy.ndarray = ImageUtils._take_screenshot()
+        src: numpy.ndarray = ImageUtils._grab_screen()
         template = ImageUtils._scaled_template(template)
         height, width = template.shape
 

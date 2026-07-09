@@ -24,6 +24,9 @@ _EN = {
 
     # ---- 任務分頁 ----
     "遊戲模式": "Game Mode",
+    "關卡": "Mission",
+    "目標道具": "Target Item",
+    "使用說明": "Help",
     "戰鬥腳本": "Combat Script",
     "次數": "Runs",
     "新增任務": "Add Task",
@@ -79,6 +82,42 @@ _EN = {
     "第 {i} 個任務開始：{name}": "Task {i} started: {name}",
     "第 {i} 個任務結束（代碼 {code}）": "Task {i} finished (exit code {code})",
     "休息 {m} 分鐘…": "Taking a break for {m} minute(s)...",
+
+    # ---- 使用說明 ----
+    "【使用前準備】\n"
+    "1. 用瀏覽器開啟碧藍幻想，視窗保持可見（不要縮小）\n"
+    "2. 遊戲畫面停在「首頁」（看得到底部的 Home 按鈕）\n"
+    "3. 遊戲內開啟兩個 Auto Restore 設定\n"
+    "\n"
+    "【操作步驟】\n"
+    "1. 選遊戲模式 → 關卡 → 目標道具\n"
+    "2. 選戰鬥腳本（full_auto 適合大多數情況）\n"
+    "3. 設定次數，按「新增任務」\n"
+    "4. 可以加多個任務、拖曳排序、插入休息時段\n"
+    "5. 按「開始」，機器人會自動校準螢幕並依序執行\n"
+    "\n"
+    "【注意事項】\n"
+    "• 執行中不要動滑鼠鍵盤（靜態視窗模式下不能移動遊戲視窗）\n"
+    "• 出現驗證碼會播音效提醒，請手動輸入，完成後自動繼續\n"
+    "• 長時間掛機有封號風險，建議搭配休息時段\n"
+    "• 設定分頁可調整滑鼠模擬、執行間隔等進階選項":
+        "[Before You Start]\n"
+        "1. Open Granblue Fantasy in a browser and keep the window visible\n"
+        "2. Stay on the Home screen (the Home button at the bottom must be visible)\n"
+        "3. Enable both Auto Restore settings in-game\n"
+        "\n"
+        "[Steps]\n"
+        "1. Pick a game mode, mission, and target item\n"
+        "2. Pick a combat script (full_auto works for most cases)\n"
+        "3. Set the run count and click \"Add Task\"\n"
+        "4. Add multiple tasks, drag to reorder, or insert breaks\n"
+        "5. Click \"Start\" — the bot auto-calibrates your screen and runs the queue\n"
+        "\n"
+        "[Notes]\n"
+        "- Don't touch the mouse/keyboard while running (and don't move the game window in static-window mode)\n"
+        "- On CAPTCHA, a sound plays; solve it by hand and the bot resumes automatically\n"
+        "- Long farming sessions risk account flags; schedule breaks\n"
+        "- The Settings tab has advanced options (mouse simulation, delays, etc.)",
 }
 
 

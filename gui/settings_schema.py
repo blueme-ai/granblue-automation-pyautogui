@@ -13,6 +13,9 @@ def build_settings(
     combat_script_name: str,
     combat_script: List[str],
     app_options: dict,
+    mission: str = "",
+    map_name: str = "",
+    item: str = "",
 ) -> dict:
     """組出一個任務的完整後端設定。
 
@@ -22,6 +25,9 @@ def build_settings(
         combat_script_name: 戰鬥腳本檔名。
         combat_script: 戰鬥腳本內容（逐行）。
         app_options: 設定分頁的全域選項（見 main_window.collect_options()）。
+        mission: 關卡名稱（例如 "Slithering Seductress"）。
+        map_name: 地圖名稱（例如 "Zone Eletio"）。
+        item: 目標道具名稱（例如 "Repeated Runs"）。
     """
     opt = app_options
     return {
@@ -29,9 +35,9 @@ def build_settings(
             "combatScriptName": combat_script_name,
             "combatScript": combat_script,
             "farmingMode": farming_mode,
-            "item": "",
-            "mission": "",
-            "map": "",
+            "item": item,
+            "mission": mission,
+            "map": map_name,
             "itemAmount": item_amount,
             "summons": [],
             "summonDefault": False,
