@@ -30,10 +30,12 @@ from bot.game_modes.exo import Exo
 #from bot.game_modes.raid import Raid
 from bot.game_modes.raid2 import Raid
 from bot.game_modes.sidestory import SideStory
-from bot.game_modes.rotb import RiseOfTheBeasts
+# 改用原版完整導航（harjeb 版 rotb.py 依賴他自製的瀏覽器書籤快捷鍵 Alt+N，一般環境無法使用）
+from bot.game_modes._rotb import RiseOfTheBeasts
 from bot.game_modes.special import Special
 from bot.game_modes.xeno_clash import XenoClash
-from bot.game_modes.generic2 import Generic
+# generic.py 的 _Generic 是原版「按 Play Again 重複刷」邏輯；generic2 依賴書籤快捷鍵
+from bot.game_modes.generic import _Generic as Generic
 
 pyautogui.FAILSAFE = False
 
@@ -71,10 +73,10 @@ class Game:
         from bot.game_modes.sidestory import SideStory
         #from bot.game_modes.raid import Raid
         from bot.game_modes.raid2 import Raid
-        from bot.game_modes.rotb import RiseOfTheBeasts
+        from bot.game_modes._rotb import RiseOfTheBeasts
         from bot.game_modes.special import Special
         from bot.game_modes.xeno_clash import XenoClash
-        from bot.game_modes.generic2 import Generic
+        from bot.game_modes.generic import _Generic as Generic
 
         self.eventpage_x = 0
         self.eventpage_y = 0
@@ -425,11 +427,13 @@ class Game:
         MessageLog.print_message("\n[INFO] Starting Choose First Summon...")
         try:
             # Now select the first Summon.
+            # 187 是 1 倍縮放時第一顆召喚石相對按鈕的偏移，要乘上螢幕縮放比例
+            offset = int(187 * ImageUtils._template_scale)
             choose_a_summon_location = ImageUtils.find_button("choose_a_summon")
-            MouseUtils.move_and_click_point(choose_a_summon_location[0], choose_a_summon_location[1] + 187, "choose_a_summon")
+            MouseUtils.move_and_click_point(choose_a_summon_location[0], choose_a_summon_location[1] + offset, "choose_a_summon")
             # Check for CAPTCHA here. If detected, stop the bot and alert the user.
             if Game.check_for_captcha():
-                MouseUtils.move_and_click_point(choose_a_summon_location[0], choose_a_summon_location[1] + 187, "choose_a_summon")
+                MouseUtils.move_and_click_point(choose_a_summon_location[0], choose_a_summon_location[1] + offset, "choose_a_summon")
             return True
         except:
             MessageLog.print_message("\n[ERROR] Seems Choose First Summon failed...")
@@ -438,7 +442,11 @@ class Game:
 
     @staticmethod
     def select_summon(summon_list: List[str], summon_element_list: List[str]):
-        return True
+        """選擇支援召喚石。summonDefault 開啟或未指定清單時直接選第一顆，
+        否則用圖像匹配找指定的召喚石（原版行為）。"""
+        if Settings.summon_default or len(summon_list) == 0:
+            return Game.select_default_summon()
+        return Game._select_summon(summon_list, summon_element_list)
 
 
     @staticmethod
@@ -478,7 +486,7 @@ class Game:
 
             # Now select the first Summon.
             choose_a_summon_location = ImageUtils.find_button("choose_a_summon")
-            MouseUtils.move_and_click_point(choose_a_summon_location[0], choose_a_summon_location[1] + 187, "choose_a_summon")
+            MouseUtils.move_and_click_point(choose_a_summon_location[0], choose_a_summon_location[1] + int(187 * ImageUtils._template_scale), "choose_a_summon")
 
             return True
         else:
@@ -513,7 +521,7 @@ class Game:
 
                 # Now select the first Summon.
                 choose_a_summon_location = ImageUtils.find_button("choose_a_summon")
-                MouseUtils.move_and_click_point(choose_a_summon_location[0], choose_a_summon_location[1] + 187, "choose_a_summon")
+                MouseUtils.move_and_click_point(choose_a_summon_location[0], choose_a_summon_location[1] + int(187 * ImageUtils._template_scale), "choose_a_summon")
 
                 # Now start the Old Lignoid Trial Battle right away and then wait a few seconds.
                 Game.find_and_click_button("party_selection_ok")
@@ -610,22 +618,24 @@ class Game:
             if group_number > 7:
                 group_number = group_number -7
 
+            # 偏移量是 1 倍縮放時量的，乘上螢幕縮放比例
+            _s = ImageUtils._template_scale
             if group_number == 1:
-                x = set_location[0] - 350
+                x = set_location[0] - int(350 * _s)
             elif group_number == 2:
-                x = set_location[0] - 290
+                x = set_location[0] - int(290 * _s)
             elif group_number == 3:
-                x = set_location[0] - 230
+                x = set_location[0] - int(230 * _s)
             elif group_number == 4:
-                x = set_location[0] - 170
+                x = set_location[0] - int(170 * _s)
             elif group_number == 5:
-                x = set_location[0] - 110
+                x = set_location[0] - int(110 * _s)
             elif group_number == 6:
-                x = set_location[0] - 50
+                x = set_location[0] - int(50 * _s)
             else:
-                x = set_location[0] + 10
+                x = set_location[0] + int(10 * _s)
 
-            y = set_location[1] + 50
+            y = set_location[1] + int(50 * _s)
             MouseUtils.move_and_click_point(x, y, "template_group", mouse_clicks = 2)
 
             # Now select the correct Party.
@@ -633,19 +643,19 @@ class Game:
                 MessageLog.print_message(f"[DEBUG] Successfully selected Group {group_number}. Now selecting Party {party_number}...")
 
             if party_number == 1:
-                x = set_location[0] - 309
+                x = set_location[0] - int(309 * _s)
             elif party_number == 2:
-                x = set_location[0] - 252
+                x = set_location[0] - int(252 * _s)
             elif party_number == 3:
-                x = set_location[0] - 195
+                x = set_location[0] - int(195 * _s)
             elif party_number == 4:
-                x = set_location[0] - 138
+                x = set_location[0] - int(138 * _s)
             elif party_number == 5:
-                x = set_location[0] - 81
+                x = set_location[0] - int(81 * _s)
             elif party_number == 6:
-                x = set_location[0] - 24
+                x = set_location[0] - int(24 * _s)
 
-            y = set_location[1] + 325
+            y = set_location[1] + int(325 * _s)
             MouseUtils.move_and_click_point(x, y, "template_party", mouse_clicks = 2)
 
             Settings.party_selection_first_run = False
@@ -871,7 +881,7 @@ class Game:
             if (Settings.farming_mode == "Rise of the Beasts" and RiseOfTheBeasts.check_for_rotb_extreme_plus()) or (
                     Settings.farming_mode == "Special" and Settings.mission_name == "VH Angel Halo" and Settings.item_name == "Angel Halo Weapons" and Special.check_for_dimensional_halo()) or (
                     (Settings.farming_mode == "Event" or Settings.farming_mode == "Event (Token Drawboxes)") and Event.check_for_event_nightmare()) or (
-                    Settings.farming_mode == "Xeno Clash" and XenoClash.check_for_xeno_clash_nightmare()):
+                    Settings.farming_mode == "Xeno Clash" and hasattr(XenoClash, "check_for_xeno_clash_nightmare") and XenoClash.check_for_xeno_clash_nightmare()):
                 return True
 
             # If the bot tried to repeat a Extreme/Impossible difficulty Event Raid and it lacked the treasures to host it, go back to select the Mission again.
@@ -1121,7 +1131,7 @@ class Game:
                         GuildWars.start(first_run)
                     elif Settings.farming_mode == "Dread Barrage":       # 公会战
                         DreadBarrage.start(first_run)
-                    elif Settings.farming_mode == "Side Story":       # 公会战
+                    elif Settings.farming_mode == "Side Story":       # 支線（僅支援書籤快捷鍵環境）
                         SideStory.start()
                     elif Settings.farming_mode == "Proving Grounds":     #连战
                         ProvingGrounds.start(first_run)
