@@ -150,3 +150,6 @@ gui/src-tauri/WixTools/
 gui/src-tauri/target/
 
 gui/src-tauri/settings.json
+
+settings.json
+.venv/

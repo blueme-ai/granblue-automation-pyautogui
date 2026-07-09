@@ -90,6 +90,9 @@ class Game:
         Returns:
             None
         """
+        # 先自動偵測螢幕縮放比例（支援 2K/4K 與非 100% DPI 縮放）
+        ImageUtils.determine_template_scale()
+
         # Save the location of the "Home" button at the bottom of the bot window.
         Settings.home_button_location = ImageUtils.find_button("home", bypass_general_adjustment = True)
 
@@ -332,12 +335,13 @@ class Game:
         MessageLog.print_message("\n[CAPTCHA] box post is %s." % str(captcha_box))
         code_textbox = (captcha_box[0] , captcha_box[1])
         MouseUtils.move_and_click_point(code_textbox[0], code_textbox[1], "template_room_code_textbox", mouse_clicks = 2)
-        # 判断是否开了大写,如果开启则关闭
-        import win32api
-        import win32con
-        if win32api.GetKeyState(20):
-            win32api.keybd_event(20,0,0,0) # 按下Caps Lock键
-            win32api.keybd_event(20,0,win32con.KEYEVENTF_KEYUP,0) # 释放Caps Lock键
+        # 判斷是否開了大寫，如果開啟則關閉（僅 Windows；mac 無此 API）
+        if sys.platform == "win32":
+            import win32api
+            import win32con
+            if win32api.GetKeyState(20):
+                win32api.keybd_event(20,0,0,0) # 按下Caps Lock键
+                win32api.keybd_event(20,0,win32con.KEYEVENTF_KEYUP,0) # 释放Caps Lock键
         MouseUtils.clear_textbox()
         # Copy the room code to the clipboard and then paste it into the "Room Code" textbox.
         MouseUtils.copy_to_clipboard(code)

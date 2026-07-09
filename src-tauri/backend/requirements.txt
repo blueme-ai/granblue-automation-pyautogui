@@ -1,8 +1,11 @@
-# PyTorch - CPU 版本（無需顯卡也能跑）
-# 若有 NVIDIA GPU 可改為：torch>=2.1.0+cu121
-torch>=2.1.0
-torchvision>=0.16.0
-torchaudio>=2.1.0
+# PyTorch - CPU 版本（無需顯卡也能跑）；有 NVIDIA GPU 可自行改裝 CUDA 版
+# Intel Mac 只支援到 2.2.x（PyTorch 2.3 起停止提供 x86_64 macOS 版本）
+torch>=2.1.0; sys_platform != "darwin" or platform_machine == "arm64"
+torchvision>=0.16.0; sys_platform != "darwin" or platform_machine == "arm64"
+torchaudio>=2.1.0; sys_platform != "darwin" or platform_machine == "arm64"
+torch>=2.1.0,<2.3; sys_platform == "darwin" and platform_machine == "x86_64"
+torchvision>=0.16.0,<0.18; sys_platform == "darwin" and platform_machine == "x86_64"
+torchaudio>=2.1.0,<2.3; sys_platform == "darwin" and platform_machine == "x86_64"
 
 PyAutoGUI>=0.9.54
 Pillow>=10.0.0

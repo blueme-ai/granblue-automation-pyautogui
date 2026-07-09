@@ -11,10 +11,26 @@ import cv2
 import numpy
 import pyautogui
 from PIL import Image as Image
-from playsound import playsound
+
+# playsound3 為新版套件（支援 Python 3.10+），舊版 playsound 作為備援
+try:
+    from playsound3 import playsound
+except ImportError:
+    from playsound import playsound
 
 from utils.settings import Settings
 from utils.message_log import MessageLog
+
+# Windows 高 DPI 感知：讓截圖與滑鼠座標對應實體像素，避免 125%/150% 縮放時座標錯位
+if sys.platform == "win32":
+    try:
+        import ctypes
+        ctypes.windll.shcore.SetProcessDpiAwareness(2)  # PROCESS_PER_MONITOR_DPI_AWARE
+    except Exception:
+        try:
+            ctypes.windll.user32.SetProcessDPIAware()
+        except Exception:
+            pass
 
 class ImageUtils:
     """
@@ -31,6 +47,12 @@ class ImageUtils:
 
     _match_method: int = cv2.TM_CCOEFF_NORMED
     _match_location: Tuple[int, int] = None
+
+    # 模板縮放比例：模板圖是 1080p 遊戲視窗截的，2K/4K 螢幕上遊戲元件更大，
+    # 校準時由 determine_template_scale() 自動測出，之後所有匹配都套用。
+    _template_scale: float = 1.0
+    # 截圖像素 / 邏輯座標比例：mac Retina 截圖是 2 倍大，滑鼠座標要除回來。
+    _screenshot_ratio: float = 1.0
 
     # Check if the temp folder is created in the images folder.
     _current_dir: str = os.getcwd()
@@ -95,6 +117,92 @@ class ImageUtils:
         copyfile("temp/captcha.png", "temp/captcha_%s.png" % code)
 
     @staticmethod
+    def _take_screenshot() -> numpy.ndarray:
+        """截取遊戲視窗區域，回傳灰階影像，並更新截圖像素/邏輯座標比例。
+
+        Returns:
+            (numpy.ndarray): 灰階截圖。
+        """
+        if Settings.window_left is not None and Settings.window_top is not None and Settings.window_width is not None and Settings.window_height is not None:
+            region_width = Settings.window_width
+            image: PIL.Image.Image = pyautogui.screenshot(region = (Settings.window_left, Settings.window_top, Settings.window_width, Settings.window_height))
+        else:
+            region_width = pyautogui.size()[0]
+            image: PIL.Image.Image = pyautogui.screenshot()
+
+        # mac Retina 螢幕的截圖尺寸是邏輯解析度的 2 倍，記下比例供座標換算
+        ImageUtils._screenshot_ratio = image.width / region_width if region_width else 1.0
+
+        image.save(f"temp/source.png")
+        return cv2.imread(f"temp/source.png", 0)
+
+    @staticmethod
+    def _scaled_template(template: numpy.ndarray) -> numpy.ndarray:
+        """依偵測到的縮放比例調整模板尺寸。"""
+        scale = ImageUtils._template_scale * ImageUtils._screenshot_ratio
+        if abs(scale - 1.0) < 0.01:
+            return template
+        h, w = template.shape
+        return cv2.resize(template, (max(1, int(w * scale)), max(1, int(h * scale))), interpolation = cv2.INTER_AREA if scale < 1.0 else cv2.INTER_CUBIC)
+
+    @staticmethod
+    def _to_logical(value: float) -> int:
+        """把截圖像素座標換算回滑鼠可用的邏輯座標。"""
+        return int(value / ImageUtils._screenshot_ratio)
+
+    @staticmethod
+    def determine_template_scale() -> float:
+        """自動偵測螢幕縮放比例：用「home」按鈕模板在 0.5～3.0 倍間掃描，
+        找出匹配度最高的縮放值。供 2K/4K 或非 100% DPI 縮放的螢幕使用。
+
+        Returns:
+            (float): 偵測到的最佳縮放比例。
+        """
+        template: numpy.ndarray = cv2.imread(f"{ImageUtils._current_dir}/images/buttons/home.jpg", 0)
+        if template is None:
+            MessageLog.print_message("[WARNING] 找不到 home 按鈕模板圖，略過縮放偵測。")
+            return ImageUtils._template_scale
+
+        src = ImageUtils._take_screenshot()
+        h, w = template.shape
+
+        best_scale = 1.0
+        best_val = -1.0
+        # 粗掃 + 細掃兩階段，避免逐一掃描太慢
+        for scale in [round(0.5 + 0.1 * i, 2) for i in range(26)]:  # 0.5 ~ 3.0，步進 0.1
+            new_w, new_h = int(w * scale), int(h * scale)
+            if new_w < 5 or new_h < 5 or new_w >= src.shape[1] or new_h >= src.shape[0]:
+                continue
+            resized = cv2.resize(template, (new_w, new_h), interpolation = cv2.INTER_AREA if scale < 1.0 else cv2.INTER_CUBIC)
+            result = cv2.matchTemplate(src, resized, cv2.TM_CCOEFF_NORMED)
+            _, max_val, _, _ = cv2.minMaxLoc(result)
+            if max_val > best_val:
+                best_val = max_val
+                best_scale = scale
+
+        # 在最佳值附近細掃一輪（±0.08，步進 0.02）
+        for offset in [-0.08, -0.06, -0.04, -0.02, 0.02, 0.04, 0.06, 0.08]:
+            scale = round(best_scale + offset, 2)
+            new_w, new_h = int(w * scale), int(h * scale)
+            if scale <= 0 or new_w < 5 or new_h < 5 or new_w >= src.shape[1] or new_h >= src.shape[0]:
+                continue
+            resized = cv2.resize(template, (new_w, new_h), interpolation = cv2.INTER_AREA if scale < 1.0 else cv2.INTER_CUBIC)
+            result = cv2.matchTemplate(src, resized, cv2.TM_CCOEFF_NORMED)
+            _, max_val, _, _ = cv2.minMaxLoc(result)
+            if max_val > best_val:
+                best_val = max_val
+                best_scale = scale
+
+        if best_val >= 0.7:
+            # _scaled_template 會另外乘上 _screenshot_ratio，這裡先除掉避免重複計算
+            ImageUtils._template_scale = best_scale / ImageUtils._screenshot_ratio if ImageUtils._screenshot_ratio else best_scale
+            MessageLog.print_message(f"[INFO] 偵測到螢幕縮放比例：{best_scale}（匹配度 {best_val:.3f}），模板將自動縮放。")
+        else:
+            MessageLog.print_message(f"[WARNING] 縮放偵測沒有找到可靠的匹配（最高 {best_val:.3f}），維持原始比例。請確認遊戲畫面已開啟且首頁可見。")
+
+        return ImageUtils._template_scale
+
+    @staticmethod
     def _match(template: numpy.ndarray, confidence: float = 0.8) -> bool:
         """Updates the window dimensions for PyAutoGUI to perform faster operations in.
 
@@ -106,13 +214,8 @@ class ImageUtils:
             (bool): True if the template was found inside the source image and False otherwise.
         """
         match_check = False
-        if Settings.window_left is not None and Settings.window_top is not None and Settings.window_width is not None and Settings.window_height is not None:
-            image: PIL.Image.Image = pyautogui.screenshot(region = (Settings.window_left, Settings.window_top, Settings.window_width, Settings.window_height))
-        else:
-            image: PIL.Image.Image = pyautogui.screenshot()
-
-        image.save(f"temp/source.png")
-        src: numpy.ndarray = cv2.imread(f"temp/source.png", 0)
+        src: numpy.ndarray = ImageUtils._take_screenshot()
+        template = ImageUtils._scaled_template(template)
         height, width = template.shape
 
         result: numpy.ndarray = cv2.matchTemplate(src, template, ImageUtils._match_method)
@@ -135,14 +238,15 @@ class ImageUtils:
             cv2.rectangle(src, ImageUtils._match_location, region, 255, 5)
             cv2.imwrite(f"temp/match.png", src)
 
-            if Settings.additional_calibration_required is False:
-                temp_location = list(ImageUtils._match_location)
-                temp_location[0] += int(width / 2)
-                temp_location[1] += int(height / 2)
-            else:
-                temp_location = list(ImageUtils._match_location)
-                temp_location[0] += (pyautogui.size()[0] - (pyautogui.size()[0] - Settings.window_left)) + int(width / 2)
-                temp_location[1] += (pyautogui.size()[1] - (pyautogui.size()[1] - Settings.window_top)) + int(height / 2)
+            # 換算回邏輯座標（Retina 截圖是 2 倍像素，滑鼠座標要除回來）
+            temp_location = [
+                ImageUtils._to_logical(ImageUtils._match_location[0] + width / 2),
+                ImageUtils._to_logical(ImageUtils._match_location[1] + height / 2),
+            ]
+
+            if Settings.additional_calibration_required:
+                temp_location[0] += Settings.window_left
+                temp_location[1] += Settings.window_top
 
             ImageUtils._match_location = tuple(temp_location)
 
@@ -166,14 +270,8 @@ class ImageUtils:
         Returns:
             (List[Tuple[int, ...]]): List of Tuples containing match locations.
         """
-        if Settings.window_left is not None and Settings.window_top is not None and Settings.window_width is not None and Settings.window_height is not None:
-            image: PIL.Image.Image = pyautogui.screenshot(region = (Settings.window_left, Settings.window_top, Settings.window_width, Settings.window_height))
-        else:
-            image: PIL.Image.Image = pyautogui.screenshot()
-
-        image.save(f"temp/source.png")
-
-        src: numpy.ndarray = cv2.imread(f"temp/source.png", 0)
+        src: numpy.ndarray = ImageUtils._take_screenshot()
+        template = ImageUtils._scaled_template(template)
         height, width = template.shape
 
         match_check = True
@@ -205,14 +303,15 @@ class ImageUtils:
                 if Settings.debug_mode:
                     cv2.imwrite(f"temp/matchAll.png", src)
 
-                if Settings.additional_calibration_required is False:
-                    temp_location = list(ImageUtils._match_location)
-                    temp_location[0] += int(width / 2)
-                    temp_location[1] += int(height / 2)
-                else:
-                    temp_location = list(ImageUtils._match_location)
-                    temp_location[0] += (pyautogui.size()[0] - (pyautogui.size()[0] - Settings.window_left)) + int(width / 2)
-                    temp_location[1] += (pyautogui.size()[1] - (pyautogui.size()[1] - Settings.window_top)) + int(height / 2)
+                # 換算回邏輯座標（Retina 截圖是 2 倍像素，滑鼠座標要除回來）
+                temp_location = [
+                    ImageUtils._to_logical(ImageUtils._match_location[0] + width / 2),
+                    ImageUtils._to_logical(ImageUtils._match_location[1] + height / 2),
+                ]
+
+                if Settings.additional_calibration_required:
+                    temp_location[0] += Settings.window_left
+                    temp_location[1] += Settings.window_top
 
                 ImageUtils._match_location = tuple(temp_location)
                 match_locations.append(ImageUtils._match_location)

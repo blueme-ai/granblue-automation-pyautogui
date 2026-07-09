@@ -1,0 +1,19 @@
+{
+  "game": {
+    "farmingMode": "Quest",
+    "item": "test",
+    "map": "test",
+    "mission": "test",
+    "itemAmount": 1,
+    "debugMode": false
+  },
+  "twitter": {},
+  "discord": {},
+  "api": {},
+  "configuration": {},
+  "nightmare": {},
+  "event": {},
+  "sandbox": {},
+  "arcarum": {},
+  "adjustment": {}
+}

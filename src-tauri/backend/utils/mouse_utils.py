@@ -2,7 +2,7 @@ import random
 
 import pyautogui
 import pyperclip
-from pyHM import mouse
+# pyHM 已停止維護且僅剩註解程式碼使用，移除以支援 Python 3.11+
 #from utils.cBezier import bezierTrajectory
 from pyclick import HumanClicker
 from utils.settings import Settings
