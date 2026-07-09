@@ -37,3 +37,9 @@ src-tauri/logs/
 .env
 __pycache__/
 gui/data/ui_config.json
+
+src-tauri/backend/farm_queue/
+src-tauri/temp/
+src-tauri/mouse.log
+src-tauri/backend/log/
+results/
