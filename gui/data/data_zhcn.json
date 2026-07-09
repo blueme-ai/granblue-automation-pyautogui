@@ -1299,10 +1299,28 @@
     }
   },
   "多人": {
-    "Lvl 50 风妈": {
-      "map": "Tiamat Omega",
+    "釘選1": {
+      "map": "",
       "items": [
-        "Tiamat Omega"
+        "Repeated Runs"
+      ]
+    },
+    "釘選2": {
+      "map": "",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "釘選3": {
+      "map": "",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "釘選4": {
+      "map": "",
+      "items": [
+        "Repeated Runs"
       ]
     }
   },

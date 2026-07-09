@@ -3,9 +3,7 @@ from utils.message_log import MessageLog
 from utils.image_utils import ImageUtils
 from utils.mouse_utils import MouseUtils
 from bot.combat_mode import CombatMode
-import re
 import pyautogui
-import cv2
 
 class RaidException(Exception):
     def __init__(self, message):
@@ -22,20 +20,41 @@ class Raid:
 
     @staticmethod
     def go_to_finder():
+        """圖像導航到救援列表頁（首頁 → 任務 → Raid），取代舊版的 Alt+2 書籤快捷鍵。"""
         from bot.game import Game
-        # raid
-        pyautogui.keyDown('alt')
-        pyautogui.press('2')
-        pyautogui.keyUp('alt')
 
-           
-        
+        Game.go_back_home(confirm_location_check = True)
+        Game.find_and_click_button("quest")
+        Game.wait(2.0)
+
+        # 檢查「你已從 Raid 撤退」彈窗與待處理戰鬥。
+        if ImageUtils.confirm_location("you_retreated_from_the_raid_battle", tries = 2):
+            Game.find_and_click_button("ok")
+        if Game.check_for_pending():
+            Game.find_and_click_button("quest")
+            Game.wait(2.0)
+
+        Game.find_and_click_button("raid")
+        Game.wait(2.0)
+        Raid._select_pinned_raid()
+
     @staticmethod
-    def go_to_pending():
-        # pending
-        pyautogui.keyDown('alt')
-        pyautogui.press('3')
-        pyautogui.keyUp('alt')
+    def _select_pinned_raid():
+        """切換到指定的釘選分頁（關卡名「釘選1」～「釘選4」）。
+
+        需要 images/buttons/raid_tab_1.jpg ~ raid_tab_4.jpg 模板；
+        還沒截圖做模板前，找不到就沿用目前顯示的分頁。
+        """
+        from bot.game import Game
+
+        if not Settings.mission_name.startswith("釘選"):
+            return
+
+        n = Settings.mission_name[-1]
+        if Game.find_and_click_button(f"raid_tab_{n}", tries = 3, suppress_error = True):
+            Game.wait(1.5)
+        else:
+            MessageLog.print_message(f"[RAID] 找不到釘選分頁模板 raid_tab_{n}，沿用目前選中的分頁...")
 
     @staticmethod
     def _check_for_joined_raids():
@@ -114,15 +133,10 @@ class Raid:
         
         Game.wait(1.0)
         hp_list = ImageUtils.find_all("hp")
-        # 步骤 1: 偏移坐标
-        #  50   50% hp
-        #  85   90 %
-        #  30   30%
-        # min 20
-        # max  89
-        print(Settings.hp_remain)
-        offset_points = [(x + Settings.hp_remain, y) for (x, y) in hp_list]
-        print(offset_points)
+        # 沿 HP 條往右偏移 hp_remain 像素（1 倍縮放時 20~89 對應 HP 百分比），
+        # 取該點顏色判斷 HP 是否高於門檻；偏移要乘上螢幕縮放比例
+        hp_offset = int(Settings.hp_remain * ImageUtils._template_scale)
+        offset_points = [(x + hp_offset, y) for (x, y) in hp_list]
 
         # 步骤 2: 获取 RGB 颜色值
         def get_rgb_value(x, y):
@@ -156,25 +170,6 @@ class Raid:
         return True
 
     @staticmethod
-    def find_the_best() -> int:
-        "find the best room"
-        roomid = 1
-        logpath = "C:\\Users\\harjeb\\AppData\\Local\\Google\\Chrome\\User Data\\chrome_debug.log"
-        # read logpath
-        with open(logpath, "r") as f:
-            lines = f.readlines()
-            # find last line contains CONSOLE(56)
-            for line in reversed(lines):
-                if "CONSOLE(56)" in line:
-                    break
-            print(line)
-            str = re.findall(r'CONSOLE\(56\)\] "(.*) ', line)
-            print(str)
-            roomid = int(str[0])
-            return roomid
-            
-
-    @staticmethod
     def _navigate():
         """Navigates to the specified Raid.
 
@@ -203,18 +198,18 @@ class Raid:
 
         #Game.wait(3.0)
         # Now navigate to the Raid screen.
-        #Game.find_and_click_button("raid")
-        #Game.find_and_click_button("home")
-        #MessageLog.print_message(f"\n[RAID] Now moving to the \"home\" screen.")
-        #Raid._clear_joined_raids()
         Raid.go_to_finder()
         for i in range(10):
-            success = Raid._join_raid()  # 调用 _join_raid 方法并获取返回值
+            success = Raid._join_raid()
             if success:
-                break  # 如果成功加入，退出循环
+                break
+            # 頁內重整救援列表；沒有按鈕就 F5 重載頁面後重新選分頁
+            if Game.find_and_click_button("reload_room", tries = 2, suppress_error = True):
+                Game.wait(2)
             else:
                 pyautogui.press('f5')
-                Game.wait(2)
+                Game.wait(3)
+                Raid._select_pinned_raid()
 
 
     @staticmethod
