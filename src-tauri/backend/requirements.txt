@@ -21,5 +21,8 @@ dictor>=0.1.11
 async_lru>=2.0.4
 websockets>=12.0
 
+# GUI（跨平台，Windows / Intel Mac / Apple Silicon 皆支援）
+PySide6>=6.6
+
 # 僅 Windows 需要
 pywin32>=306; sys_platform == "win32"

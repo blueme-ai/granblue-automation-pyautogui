@@ -35,3 +35,5 @@ src-tauri/logs/
 .idea/
 
 .env
+__pycache__/
+gui/data/ui_config.json
