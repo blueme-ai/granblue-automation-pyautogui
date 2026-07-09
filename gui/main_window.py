@@ -34,8 +34,8 @@ _TAURI_DIR = os.path.join(_REPO_ROOT, "src-tauri")
 _SCRIPTS_DIR = os.path.join(_TAURI_DIR, "scripts")
 _DATA_DIR = os.path.join(_GUI_DIR, "data")
 
-# 這些模式的後端仍依賴 harjeb 的瀏覽器書籤快捷鍵（多人另需找房服務），尚未改回原版導航
-BROKEN_MODES = {"多人", "快速活动", "Side Story"}
+# 這些模式的後端仍依賴 harjeb 的瀏覽器書籤快捷鍵，尚未改回原版導航
+BROKEN_MODES = {"快速活动", "Side Story"}
 
 
 def _load_json(name: str) -> dict:
@@ -211,6 +211,12 @@ class MainWindow(QWidget):
         self.rest_check = QCheckBox()
         self.rest_check.setChecked(False)
         row.addWidget(self.rest_check)
+        self.game_lang_label = QLabel()
+        self.game_lang_combo = QComboBox()
+        self.game_lang_combo.addItem("English", "en")
+        self.game_lang_combo.addItem("日本語", "jp")
+        row.addWidget(self.game_lang_label)
+        row.addWidget(self.game_lang_combo)
         row.addStretch()
         run_grid.addLayout(row)
         settings_layout.addWidget(self.run_group)
@@ -309,6 +315,8 @@ class MainWindow(QWidget):
         self.delay_min_label.setText(tr("最短"))
         self.delay_max_label.setText(tr("最長"))
         self.rest_check.setText(tr("開場先休息"))
+        self.game_lang_label.setText(tr("遊戲語言"))
+        self.game_lang_combo.setToolTip(tr("日本語需要 images/buttons_jp 的模板圖，缺圖時自動退回英文模板"))
 
         self.combat_group.setTitle(tr("戰鬥選項"))
         self.refresh_check.setText(tr("戰鬥中刷新（auto/FA 攻擊後刷新頁面）"))
@@ -440,6 +448,7 @@ class MainWindow(QWidget):
             "auto_exit_minutes": self.auto_exit_spin.value(),
             "no_timeout": self.no_timeout_check.isChecked(),
             "hp_remain": self.hp_spin.value(),
+            "game_language": self.game_lang_combo.currentData(),
         }
 
     def _toggle_run(self):

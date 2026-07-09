@@ -45,6 +45,7 @@ def build_settings(
             "groupNumber": 0,
             "partyNumber": 0,
             "debugMode": False,
+            "gameLanguage": opt.get("game_language", "en"),
         },
         "twitter": {
             "twitterUseVersion2": False,

@@ -41,6 +41,8 @@ class Settings:
     group_number: int = dictor(_data, "game.groupNumber", 1)
     party_number: int = dictor(_data, "game.partyNumber", 1)
     debug_mode: bool = dictor(_data, "game.debugMode", False)
+    # 遊戲客戶端語言：en / jp。jp 時優先使用 images/buttons_jp、images/headers_jp 的模板
+    game_language: str = dictor(_data, "game.gameLanguage", "en")
 
     # #### twitter ####
     twitter_use_version2: bool = dictor(_data, "twitter.twitterUseVersion2", False)
@@ -239,6 +241,8 @@ class Settings:
         Settings.group_number: int = dictor(_data, "game.groupNumber", 1)
         Settings.party_number: int = dictor(_data, "game.partyNumber", 1)
         Settings.debug_mode: bool = dictor(_data, "game.debugMode", False)
+        # 遊戲客戶端語言：en / jp。jp 時優先使用 images/buttons_jp、images/headers_jp 的模板
+        Settings.game_language: str = dictor(_data, "game.gameLanguage", "en")
 
         # #### twitter ####
         Settings.twitter_use_version2: bool = dictor(_data, "twitter.twitterUseVersion2", False)

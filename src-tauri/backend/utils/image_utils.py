@@ -60,6 +60,21 @@ class ImageUtils:
     if not os.path.exists(_temp_dir):
         os.makedirs(_temp_dir)
 
+    @staticmethod
+    def _template_path(folder: str, filename: str) -> str:
+        """依遊戲語言解析模板路徑。
+
+        gameLanguage 不是 en 時優先找 images/<folder>_<lang>/（例如 buttons_jp/），
+        沒有對應語言的模板就退回預設英文版模板。圖示類按鈕跨語言通用，
+        只有含文字的按鈕/標頭需要提供在地化模板。
+        """
+        lang = getattr(Settings, "game_language", "en")
+        if lang and lang != "en":
+            localized = f"{ImageUtils._current_dir}/images/{folder}_{lang}/{filename}"
+            if os.path.exists(localized):
+                return localized
+        return f"{ImageUtils._current_dir}/images/{folder}/{filename}"
+
     # _reader: easyocr.Reader = None
 
     @staticmethod
@@ -137,7 +152,7 @@ class ImageUtils:
         Returns:
             (float): 偵測到的最佳縮放比例。
         """
-        template: numpy.ndarray = cv2.imread(f"{ImageUtils._current_dir}/images/buttons/home.jpg", 0)
+        template: numpy.ndarray = cv2.imread(ImageUtils._template_path("buttons", "home.jpg"), 0)
         if template is None:
             MessageLog.print_message("[WARNING] 找不到 home 按鈕模板圖，略過縮放偵測。")
             return ImageUtils._template_scale
@@ -378,7 +393,11 @@ class ImageUtils:
         if Settings.debug_mode:
             MessageLog.print_message(f"\n[DEBUG] Starting process to find the {image_name.upper()} button image...")
 
-        template: numpy.ndarray = cv2.imread(f"{ImageUtils._current_dir}/images/buttons/{image_name.lower()}.jpg", 0)
+        template: numpy.ndarray = cv2.imread(ImageUtils._template_path("buttons", f"{image_name.lower()}.jpg"), 0)
+        if template is None:
+            if not suppress_error:
+                MessageLog.print_message(f"[WARNING] 模板圖檔 {image_name.lower()}.jpg 不存在，跳過搜尋。")
+            return None
 
         new_tries = ImageUtils._determine_adjustment(image_name)
         if new_tries == 0 and disable_adjustment is False:
@@ -425,7 +444,11 @@ class ImageUtils:
         #     MessageLog.print_message("Find resume image")
             # 可能在resume game界面，需要重新进战斗
 
-        template: numpy.ndarray = cv2.imread(f"{ImageUtils._current_dir}/images/headers/{image_name.lower()}_header.jpg", 0)
+        template: numpy.ndarray = cv2.imread(ImageUtils._template_path("headers", f"{image_name.lower()}_header.jpg"), 0)
+        if template is None:
+            if not suppress_error:
+                MessageLog.print_message(f"[WARNING] 標頭模板 {image_name.lower()}_header.jpg 不存在，跳過確認。")
+            return False
 
         new_tries = ImageUtils._determine_adjustment(image_name)
         if new_tries == 0 and disable_adjustment is False:
@@ -589,7 +612,10 @@ class ImageUtils:
         else:
             folder_name = "buttons"
 
-        template: numpy.ndarray = cv2.imread(f"{ImageUtils._current_dir}/images/{folder_name}/{image_name}.jpg", 0)
+        template: numpy.ndarray = cv2.imread(ImageUtils._template_path(folder_name, f"{image_name}.jpg"), 0)
+        if template is None:
+            MessageLog.print_message(f"[WARNING] 模板圖檔 {image_name}.jpg 不存在，回傳空清單。")
+            return []
 
         locations = ImageUtils._match_all(template, custom_confidence)
         filtered_locations: List[Tuple[int, ...]] = []
@@ -756,7 +782,11 @@ class ImageUtils:
         """
         MessageLog.print_message(f"\n[INFO] Now waiting for {image_name} to vanish from screen...")
 
-        template: numpy.ndarray = cv2.imread(f"{ImageUtils._current_dir}/images/buttons/{image_name.lower()}.jpg", 0)
+        template: numpy.ndarray = cv2.imread(ImageUtils._template_path("buttons", f"{image_name.lower()}.jpg"), 0)
+        if template is None:
+            if suppress_error is False:
+                MessageLog.print_message(f"[WARNING] 模板圖檔 {image_name.lower()}.jpg 不存在。")
+            return False
 
         for _ in range(timeout):
             if ImageUtils._match(template) is False:
@@ -778,7 +808,7 @@ class ImageUtils:
         Returns:
             (Tuple[int, int]): Tuple of the width and the height of the image.
         """
-        image = Image.open(f"{ImageUtils._current_dir}/images/buttons/{image_name}.jpg")
+        image = Image.open(ImageUtils._template_path("buttons", f"{image_name}.jpg"))
         width, height = image.size
         image.close()
         return width, height

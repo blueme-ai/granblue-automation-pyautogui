@@ -442,8 +442,14 @@ class Game:
 
     @staticmethod
     def select_summon(summon_list: List[str], summon_element_list: List[str]):
-        """選擇支援召喚石。summonDefault 開啟或未指定清單時直接選第一顆，
+        """選擇支援召喚石。優先用遊戲內建的自動選擇按鈕（需 summon_auto_select 模板，
+        待截圖製作）；沒有模板時，summonDefault 開啟或未指定清單就直接選第一顆，
         否則用圖像匹配找指定的召喚石（原版行為）。"""
+        if ImageUtils.find_button("summon_auto_select", tries = 1, suppress_error = True) is not None:
+            MessageLog.print_message("\n[INFO] 使用遊戲內建的自動選擇召喚石...")
+            Game.find_and_click_button("summon_auto_select")
+            Game.wait(1.0)
+            return True
         if Settings.summon_default or len(summon_list) == 0:
             return Game.select_default_summon()
         return Game._select_summon(summon_list, summon_element_list)
