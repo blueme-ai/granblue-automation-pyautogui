@@ -425,8 +425,10 @@ class ArcarumSandbox:
             Game.wait(1.0)
 
             # Now click on the specified node that has the mission offset by the coordinates associated with it based off of the Home Menu button location.
+            # 節點偏移座標是 1 倍縮放時量的，要乘上偵測到的螢幕縮放比例
+            scale = ImageUtils._template_scale
             home_location: Tuple[int, int] = ImageUtils.find_button("home_menu")
-            MouseUtils.move_and_click_point(home_location[0] - x, home_location[1] + y, "arcarum_node")
+            MouseUtils.move_and_click_point(home_location[0] - int(x * scale), home_location[1] + int(y * scale), "arcarum_node")
 
         Game.wait(1.0)
         # if gold chest exists, the mission may be invisible

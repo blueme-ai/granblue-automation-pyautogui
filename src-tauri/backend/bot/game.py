@@ -16,7 +16,8 @@ from utils.twitter_room_finder import TwitterRoomFinder
 # Imports for all the supported game modes.
 from bot.combat_mode import CombatMode
 from bot.game_modes.arcarum import Arcarum
-from bot.game_modes.arcarum_sandbox import ArcarumSandbox
+# 改用原版完整導航（harjeb 版依賴他自製的瀏覽器書籤快捷鍵 Alt+4，一般環境無法使用）
+from bot.game_modes._arcarum_sandbox import ArcarumSandbox
 from bot.game_modes.coop import Coop
 from bot.game_modes.dread_barrage import DreadBarrage
 from bot.game_modes.event import Event
@@ -59,7 +60,7 @@ class Game:
         from utils.twitter_room_finder import TwitterRoomFinder
         # Imports for all the supported game modes.
         from bot.game_modes.arcarum import Arcarum
-        from bot.game_modes.arcarum_sandbox import ArcarumSandbox
+        from bot.game_modes._arcarum_sandbox import ArcarumSandbox
         from bot.game_modes.coop import Coop
         from bot.game_modes.dread_barrage import DreadBarrage
         from bot.game_modes.event import Event
