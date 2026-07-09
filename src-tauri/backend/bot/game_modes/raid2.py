@@ -42,19 +42,25 @@ class Raid:
     def _select_pinned_raid():
         """切換到指定的釘選分頁（關卡名「釘選1」～「釘選4」）。
 
-        需要 images/buttons/raid_tab_1.jpg ~ raid_tab_4.jpg 模板；
-        還沒截圖做模板前，找不到就沿用目前顯示的分頁。
+        救援列表頁結構：Recent／Finder 兩個大分頁，釘選介面在 Finder 分頁裡，
+        四個釘選位左上角標著 1st/2nd/3rd/4th。先按右上的圓形「Raid List」鈕
+        （raid_list_button，無論目前在哪個分頁都會進 Finder 檢視），
+        再點釘選位角標（raid_pin_1 ~ raid_pin_4）。
         """
         from bot.game import Game
 
         if not Settings.mission_name.startswith("釘選"):
             return
 
+        # 進 Finder 檢視（已經在的話按了也無害）。
+        if Game.find_and_click_button("raid_list_button", tries = 3, suppress_error = True):
+            Game.wait(1.5)
+
         n = Settings.mission_name[-1]
-        if Game.find_and_click_button(f"raid_tab_{n}", tries = 3, suppress_error = True):
+        if Game.find_and_click_button(f"raid_pin_{n}", tries = 3, suppress_error = True):
             Game.wait(1.5)
         else:
-            MessageLog.print_message(f"[RAID] 找不到釘選分頁模板 raid_tab_{n}，沿用目前選中的分頁...")
+            MessageLog.print_message(f"[RAID] 找不到釘選位模板 raid_pin_{n}，沿用目前選中的釘選...")
 
     @staticmethod
     def _check_for_joined_raids():
