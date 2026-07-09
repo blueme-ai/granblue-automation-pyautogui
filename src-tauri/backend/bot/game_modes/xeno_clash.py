@@ -70,7 +70,9 @@ class XenoClash:
                     MessageLog.print_message(f"[SPECIAL] Navigating to {Settings.map_name}...")
 
                     # Move to the specified Special by clicking its "Select" button.
-                    special_quest_select_button = (mission_select_button[0] + 145, mission_select_button[1] + 75)
+                    # (145, 75) 是 1 倍縮放時 Select 按鈕相對區塊標題的偏移，要乘上螢幕縮放比例
+                    _s = ImageUtils._template_scale
+                    special_quest_select_button = (mission_select_button[0] + int(145 * _s), mission_select_button[1] + int(75 * _s))
                     MouseUtils.move_and_click_point(special_quest_select_button[0], special_quest_select_button[1], "select")
 
                     Game.wait(1)

@@ -10,6 +10,12 @@ from utils.image_utils import ImageUtils
 from utils.mouse_utils import MouseUtils
 import pyautogui
 
+
+def _sc(offset: int) -> int:
+    """將 1 倍縮放下量測的像素偏移換算成目前偵測到的螢幕縮放比例。"""
+    return int(offset * ImageUtils._template_scale)
+
+
 class CombatModeException(Exception):
     def __init__(self, message):
         super().__init__(message)
@@ -114,7 +120,7 @@ class CombatMode:
             dialog_location = ImageUtils.find_button("dialog_vyrn", tries = 2, suppress_error = True, bypass_general_adjustment = True)
 
         if dialog_location is not None:
-            MouseUtils.move_and_click_point(dialog_location[0] + 180, dialog_location[1] - 51, "template_dialog")
+            MouseUtils.move_and_click_point(dialog_location[0] + _sc(180), dialog_location[1] - _sc(51), "template_dialog")
 
         return None
 
@@ -211,18 +217,18 @@ class CombatMode:
             None
         """
         if character_number == 1:
-            x = CombatMode._attack_button_location[0] - 213
+            x = CombatMode._attack_button_location[0] - _sc(213)
         elif character_number == 2:
-            x = CombatMode._attack_button_location[0] - 160
+            x = CombatMode._attack_button_location[0] - _sc(160)
         elif character_number == 3:
-            x = CombatMode._attack_button_location[0] - 105
+            x = CombatMode._attack_button_location[0] - _sc(105)
         elif character_number == 4:
-            x = CombatMode._attack_button_location[0] - 54
+            x = CombatMode._attack_button_location[0] - _sc(54)
         else:
             MessageLog.print_message(f"[WARNING] Invalid command received for selecting a Character. User wanted to select Character #{character_number}.")
             return
 
-        y = CombatMode._attack_button_location[1] + 80
+        y = CombatMode._attack_button_location[1] + _sc(80)
 
         # Double-clicking the character portrait to avoid any non-invasive popups from other Raid participants.
         MouseUtils.move_and_click_point(x, y, "template_character", mouse_clicks = 2)
@@ -663,7 +669,7 @@ class CombatMode:
         # Find the location of the "Cancel" button and then click the button right next to it. This is to ensure that no matter what the blue "Request Backup" button's appearance, it is ensured to be pressed.
         cancel_button_location = ImageUtils.find_button("cancel")
         if cancel_button_location is not None:
-            MouseUtils.move_and_click_point(cancel_button_location[0] + 200, cancel_button_location[1], "cancel")
+            MouseUtils.move_and_click_point(cancel_button_location[0] + _sc(200), cancel_button_location[1], "cancel")
 
         Game.wait(1)
 
@@ -731,13 +737,13 @@ class CombatMode:
                 from bot.game import Game
 
                 if target == 1:
-                    x = CombatMode._attack_button_location[0] - 280
+                    x = CombatMode._attack_button_location[0] - _sc(280)
                 elif target == 2:
-                    x = CombatMode._attack_button_location[0] - 120
+                    x = CombatMode._attack_button_location[0] - _sc(120)
                 else:
-                    x = CombatMode._attack_button_location[0] + 40
+                    x = CombatMode._attack_button_location[0] + _sc(40)
 
-                y = CombatMode._attack_button_location[1] - 290
+                y = CombatMode._attack_button_location[1] - _sc(290)
 
                 MouseUtils.move_and_click_point(x, y, "template_enemy_target")
                 Game.find_and_click_button("set_target")
@@ -775,22 +781,22 @@ class CombatMode:
 
                 if skill == "useskill(1)":
                     MessageLog.print_message(f"[COMBAT] Character {character_selected} uses Skill 1.")
-                    x = CombatMode._attack_button_location[0] - 143
+                    x = CombatMode._attack_button_location[0] - _sc(143)
                 elif skill == "useskill(2)":
                     MessageLog.print_message(f"[COMBAT] Character {character_selected} uses Skill 2.")
-                    x = CombatMode._attack_button_location[0] - 88
+                    x = CombatMode._attack_button_location[0] - _sc(88)
                 elif skill == "useskill(3)":
                     MessageLog.print_message(f"[COMBAT] Character {character_selected} uses Skill 3.")
-                    x = CombatMode._attack_button_location[0] - 32
+                    x = CombatMode._attack_button_location[0] - _sc(32)
                 elif skill == "useskill(4)":
                     MessageLog.print_message(f"[COMBAT] Character {character_selected} uses Skill 4.")
-                    x = CombatMode._attack_button_location[0] + 22
+                    x = CombatMode._attack_button_location[0] + _sc(22)
                 else:
                     MessageLog.print_message(f"[WARNING] Invalid command received for using the Character's Skill. User wanted: {skill}.")
                     Game.find_and_click_button("back")
                     return False
 
-                y = CombatMode._attack_button_location[1] + 120
+                y = CombatMode._attack_button_location[1] + _sc(120)
 
                 MouseUtils.move_and_click_point(x, y, "template_skill")
 
@@ -806,22 +812,22 @@ class CombatMode:
                     select_a_character_location = ImageUtils.find_button("select_a_character")
                     if target == "target(1)":
                         MessageLog.print_message("[COMBAT] Targeting Character 1 for Skill.")
-                        MouseUtils.move_and_click_point(select_a_character_location[0] - 90, select_a_character_location[1] + 85, "template_target")
+                        MouseUtils.move_and_click_point(select_a_character_location[0] - _sc(90), select_a_character_location[1] + _sc(85), "template_target")
                     elif "target(2)" in target:
                         MessageLog.print_message("[COMBAT] Targeting Character 2 for Skill.")
-                        MouseUtils.move_and_click_point(select_a_character_location[0], select_a_character_location[1] + 85, "template_target")
+                        MouseUtils.move_and_click_point(select_a_character_location[0], select_a_character_location[1] + _sc(85), "template_target")
                     elif "target(3)" in target:
                         MessageLog.print_message("[COMBAT] Targeting Character 3 for Skill.")
-                        MouseUtils.move_and_click_point(select_a_character_location[0] + 90, select_a_character_location[1] + 85, "template_target")
+                        MouseUtils.move_and_click_point(select_a_character_location[0] + _sc(90), select_a_character_location[1] + _sc(85), "template_target")
                     elif "target(4)" in target:
                         MessageLog.print_message("[COMBAT] Targeting Character 4 for Skill.")
-                        MouseUtils.move_and_click_point(select_a_character_location[0] - 90, select_a_character_location[1] + 250, "template_target")
+                        MouseUtils.move_and_click_point(select_a_character_location[0] - _sc(90), select_a_character_location[1] + _sc(250), "template_target")
                     elif "target(5)" in target:
                         MessageLog.print_message("[COMBAT] Targeting Character 5 for Skill.")
-                        MouseUtils.move_and_click_point(select_a_character_location[0], select_a_character_location[1] + 250, "template_target")
+                        MouseUtils.move_and_click_point(select_a_character_location[0], select_a_character_location[1] + _sc(250), "template_target")
                     elif "target(6)" in target:
                         MessageLog.print_message("[COMBAT] Targeting Character 6 for Skill.")
-                        MouseUtils.move_and_click_point(select_a_character_location[0] + 90, select_a_character_location[1] + 250, "template_target")
+                        MouseUtils.move_and_click_point(select_a_character_location[0] + _sc(90), select_a_character_location[1] + _sc(250), "template_target")
                     elif "wait" in target:
                         CombatMode._wait_execute(list(target))
                     else:
@@ -860,17 +866,17 @@ class CombatMode:
                 tries = 3
                 while ImageUtils.confirm_location("summon_details") is False:
                     if summon_index == 1:
-                        MouseUtils.move_and_click_point(CombatMode._attack_button_location[0] - 317, CombatMode._attack_button_location[1] + 138, "template_summon")
+                        MouseUtils.move_and_click_point(CombatMode._attack_button_location[0] - _sc(317), CombatMode._attack_button_location[1] + _sc(138), "template_summon")
                     elif summon_index == 2:
-                        MouseUtils.move_and_click_point(CombatMode._attack_button_location[0] - 243, CombatMode._attack_button_location[1] + 138, "template_summon")
+                        MouseUtils.move_and_click_point(CombatMode._attack_button_location[0] - _sc(243), CombatMode._attack_button_location[1] + _sc(138), "template_summon")
                     elif summon_index == 3:
-                        MouseUtils.move_and_click_point(CombatMode._attack_button_location[0] - 165, CombatMode._attack_button_location[1] + 138, "template_summon")
+                        MouseUtils.move_and_click_point(CombatMode._attack_button_location[0] - _sc(165), CombatMode._attack_button_location[1] + _sc(138), "template_summon")
                     elif summon_index == 4:
-                        MouseUtils.move_and_click_point(CombatMode._attack_button_location[0] - 89, CombatMode._attack_button_location[1] + 138, "template_summon")
+                        MouseUtils.move_and_click_point(CombatMode._attack_button_location[0] - _sc(89), CombatMode._attack_button_location[1] + _sc(138), "template_summon")
                     elif summon_index == 5:
-                        MouseUtils.move_and_click_point(CombatMode._attack_button_location[0] - 12, CombatMode._attack_button_location[1] + 138, "template_summon")
+                        MouseUtils.move_and_click_point(CombatMode._attack_button_location[0] - _sc(12), CombatMode._attack_button_location[1] + _sc(138), "template_summon")
                     else:
-                        MouseUtils.move_and_click_point(CombatMode._attack_button_location[0] + 63, CombatMode._attack_button_location[1] + 138, "template_summon")
+                        MouseUtils.move_and_click_point(CombatMode._attack_button_location[0] + _sc(63), CombatMode._attack_button_location[1] + _sc(138), "template_summon")
 
                     tries -= 1
                     if tries < 0:
