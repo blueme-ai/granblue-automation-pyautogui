@@ -1,566 +1,1584 @@
 {
-    "Side Story": {
-        "Side Story":{"map":"side story","items":["Repeated Runs"]}
+  "转世沙盒": {
+    "Slithering Seductress": {
+      "map": "Zone Eletio",
+      "items": [
+        "Fire Verum Proof",
+        "Repeated Runs"
+      ]
     },
-    "多人": {
-        "Lvl 50 风妈": {
-            "map": "Tiamat Omega",
-            "items": [
-                "Tiamat Omega"
-            ]
-        }
+    "Living Lightning Rod": {
+      "map": "Zone Eletio",
+      "items": [
+        "Lightborne Astra",
+        "Repeated Runs"
+      ]
     },
-    "快速活动": {
-        "Quest": {
-            "map": "Event Quest",
-            "items": [
-                "Repeated Runs"
-            ]
-        }
+    "Eletion Drake": {
+      "map": "Zone Eletio",
+      "items": [
+        "Sephira Stone",
+        "Repeated Runs"
+      ]
     },
-    "转世沙盒": {
-        "Slithering Seductress": {
-            "map": "Zone Eletio",
-            "items": [
-                "Fire Verum Proof",
-                "Repeated Runs"
-            ]
-        },
-        "Living Lightning Rod": {
-            "map": "Zone Eletio",
-            "items": [
-                "Lightborne Astra",
-                "Repeated Runs"
-            ]
-        },
-        "Eletion Drake": {
-            "map": "Zone Eletio",
-            "items": [
-                "Sephira Stone",
-                "Repeated Runs"
-            ]
-        },
-        "Paradoxical Gate": {
-            "map": "Zone Eletio",
-            "items": [
-                "Flameborne Astra",
-                "Repeated Runs"
-            ]
-        },
-        "Blazing Everwing": {
-            "map": "Zone Eletio",
-            "items": [
-                "Devil Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Death Seer": {
-            "map": "Zone Eletio",
-            "items": [
-                "Supreme Merit",
-                "Repeated Runs"
-            ]
-        },
-        "Hundred-Armed Hulk": {
-            "map": "Zone Eletio",
-            "items": [
-                "Star Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Terror Trifecta": {
-            "map": "Zone Eletio",
-            "items": [
-                "Fire Quartz",
-                "Repeated Runs"
-            ]
-        },
-        "Rageborn One": {
-            "map": "Zone Eletio",
-            "items": [
-                "Sun Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Trident Grandmaster": {
-            "map": "Zone Faym",
-            "items": [
-                "Water Verum Proof",
-                "Repeated Runs"
-            ]
-        },
-        "Hoarfrost Icequeen": {
-            "map": "Zone Faym",
-            "items": [
-                "Justice Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Oceanic Archon": {
-            "map": "Zone Faym",
-            "items": [
-                "Sephira Stone",
-                "Repeated Runs"
-            ]
-        },
-        "Farsea Predator": {
-            "map": "Zone Faym",
-            "items": [
-                "Supreme Merit",
-                "Repeated Runs"
-            ]
-        },
-        "Faymian Fortress": {
-            "map": "Zone Faym",
-            "items": [
-                "Moon Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Draconic Simulacrum": {
-            "map": "Zone Faym",
-            "items": [
-                "Darkborne Astra",
-                "Repeated Runs"
-            ]
-        },
-        "Azureflame Dragon": {
-            "map": "Zone Faym",
-            "items": [
-                "Aquaborne Astra",
-                "Repeated Runs"
-            ]
-        },
-        "Eyes of Sorrow": {
-            "map": "Zone Faym",
-            "items": [
-                "Water Quartz",
-                "Repeated Runs"
-            ]
-        },
-        "Mad Shearwielder": {
-            "map": "Zone Faym",
-            "items": [
-                "Death Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Avatar of Avarice": {
-            "map": "Zone Goliath",
-            "items": [
-                "Earthborne Astra",
-                "Repeated Runs"
-            ]
-        },
-        "Temptation's Guide": {
-            "map": "Zone Goliath",
-            "items": [
-                "Supreme Merit",
-                "Repeated Runs"
-            ]
-        },
-        "World's Veil": {
-            "map": "Zone Goliath",
-            "items": [
-                "Hanged Man Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Goliath Keeper": {
-            "map": "Zone Goliath",
-            "items": [
-                "Earth Quartz",
-                "Repeated Runs"
-            ]
-        },
-        "Bloodstained Barbarian": {
-            "map": "Zone Goliath",
-            "items": [
-                "Sephira Stone",
-                "Repeated Runs"
-            ]
-        },
-        "Frenzied Howler": {
-            "map": "Zone Goliath",
-            "items": [
-                "Darkborne Astra",
-                "Repeated Runs"
-            ]
-        },
-        "Goliath Vanguard": {
-            "map": "Zone Goliath",
-            "items": [
-                "Tower Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Vestige of Truth": {
-            "map": "Zone Goliath",
-            "items": [
-                "Earth Verum Proof",
-                "Repeated Runs"
-            ]
-        },
-        "Writhing Despair": {
-            "map": "Zone Goliath",
-            "items": [
-                "Death Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Vengeful Demigod": {
-            "map": "Zone Harbinger",
-            "items": [
-                "Sephira Stone",
-                "Repeated Runs"
-            ]
-        },
-        "Dirgesinger": {
-            "map": "Zone Harbinger",
-            "items": [
-                "Supreme Merit",
-                "Repeated Runs"
-            ]
-        },
-        "Wildwind Conjurer/Fullthunder Conjurer": {
-            "map": "Zone Harbinger",
-            "items": [
-                "Judgement Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Harbinger Simurgh": {
-            "map": "Zone Harbinger",
-            "items": [
-                "Temperance Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Harbinger Hardwood": {
-            "map": "Zone Harbinger",
-            "items": [
-                "Wind Verum Proof",
-                "Repeated Runs"
-            ]
-        },
-        "Demanding Stormgod": {
-            "map": "Zone Harbinger",
-            "items": [
-                "Windborne Astra",
-                "Repeated Runs"
-            ]
-        },
-        "Harbinger Tyrant": {
-            "map": "Zone Harbinger",
-            "items": [
-                "Lightborne Astra",
-                "Repeated Runs"
-            ]
-        },
-        "Phantasmagoric Aberration": {
-            "map": "Zone Harbinger",
-            "items": [
-                "Light Quartz",
-                "Repeated Runs"
-            ]
-        },
-        "Dimensional Riftwalker": {
-            "map": "Zone Harbinger",
-            "items": [
-                "Star Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Infernal Hellbeast": {
-            "map": "Zone Invidia",
-            "items": [
-                "Sephira Stone",
-                "Flameborne Astra",
-                "Devil Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Spikeball": {
-            "map": "Zone Invidia",
-            "items": [
-                "Sephira Stone",
-                "Flameborne Astra",
-                "Sun Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Blushing Groom": {
-            "map": "Zone Invidia",
-            "items": [
-                "Sephira Stone",
-                "Flameborne Astra",
-                "Devil Idean",
-                "Sun Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Unworldly Guardian": {
-            "map": "Zone Invidia",
-            "items": [
-                "Sephira Stone",
-                "Lightborne Astra",
-                "Star Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Deva of Wisdom": {
-            "map": "Zone Invidia",
-            "items": [
-                "Sephira Stone",
-                "Lightborne Astra",
-                "Star Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Sword of Aberration": {
-            "map": "Zone Invidia",
-            "items": [
-                "Sephira Stone",
-                "Lightborne Astra",
-                "Star Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Glacial Hellbeast": {
-            "map": "Zone Joculator",
-            "items": [
-                "Sephira Stone",
-                "Aquaborne Astra",
-                "Justice Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Giant Sea Plant": {
-            "map": "Zone Joculator",
-            "items": [
-                "Sephira Stone",
-                "Aquaborne Astra",
-                "Moon Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Maiden of the Depths": {
-            "map": "Zone Joculator",
-            "items": [
-                "Sephira Stone",
-                "Aquaborne Astra",
-                "Justice Idean",
-                "Moon Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Bloody Soothsayer": {
-            "map": "Zone Joculator",
-            "items": [
-                "Sephira Stone",
-                "Darkborne Astra",
-                "Death Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Nebulous One": {
-            "map": "Zone Joculator",
-            "items": [
-                "Sephira Stone",
-                "Darkborne Astra",
-                "Death Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Dreadful Scourge": {
-            "map": "Zone Joculator",
-            "items": [
-                "Sephira Stone",
-                "Darkborne Astra",
-                "Death Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Bedeviled Plague": {
-            "map": "Zone Kalendae",
-            "items": [
-                "Sephira Stone",
-                "Earthborne Astra",
-                "Hanged Man Idean",
-                "Tower Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Xeno Vohu Manah Militis": {
-            "map": "Zone Kalendae",
-            "items": [
-                "Repeated Runs"
-            ]
-        },
-        "Tainted Hellmaiden": {
-            "map": "Zone Kalendae",
-            "items": [
-                "Sephira Stone",
-                "Earthborne Astra",
-                "Hanged Man Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Watcher from Above": {
-            "map": "Zone Kalendae",
-            "items": [
-                "Sephira Stone",
-                "Earthborne Astra",
-                "Tower Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Scintillant Matter": {
-            "map": "Zone Kalendae",
-            "items": [
-                "Sephira Stone",
-                "Darkborne Astra",
-                "Death Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Ebony Executioner": {
-            "map": "Zone Kalendae",
-            "items": [
-                "Sephira Stone",
-                "Darkborne Astra",
-                "Death Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Hellbeast of Doom": {
-            "map": "Zone Kalendae",
-            "items": [
-                "Sephira Stone",
-                "Darkborne Astra",
-                "Death Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Mounted Toxophilite": {
-            "map": "Zone Liber",
-            "items": [
-                "Sephira Stone",
-                "Windborne Astra",
-                "Temperance Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Beetle of Damnation": {
-            "map": "Zone Liber",
-            "items": [
-                "Sephira Stone",
-                "Windborne Astra",
-                "Temperance Idean",
-                "Judgement Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Ageless Guardian Beast": {
-            "map": "Zone Liber",
-            "items": [
-                "Sephira Stone",
-                "Windborne Astra",
-                "Judgement Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Solar Princess": {
-            "map": "Zone Liber",
-            "items": [
-                "Sephira Stone",
-                "Lightborne Astra",
-                "Star Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Drifting Blade Demon": {
-            "map": "Zone Liber",
-            "items": [
-                "Sephira Stone",
-                "Lightborne Astra",
-                "Star Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Simpering Beast": {
-            "map": "Zone Liber",
-            "items": [
-                "Sephira Stone",
-                "Lightborne Astra",
-                "Star Idean",
-                "Repeated Runs"
-            ]
-        },
-        "Eletion Glider": {
-            "map": "Zone Eletio",
-            "items": [
-                "Repeated Runs"
-            ]
-        },
-        "Faymian Gun": {
-            "map": "Zone Faym",
-            "items": [
-                "Repeated Runs"
-            ]
-        },
-        "Goliath Triune": {
-            "map": "Zone Goliath",
-            "items": [
-                "Repeated Runs"
-            ]
-        },
-        "Harbinger Stormer": {
-            "map": "Zone Harbinger",
-            "items": [
-                "Repeated Runs"
-            ]
-        },
-        "Athena Militis": {
-            "map": "Zone Invidia",
-            "items": [
-                "Repeated Runs"
-            ]
-        },
-        "Grani Militis": {
-            "map": "Zone Joculator",
-            "items": [
-                "Repeated Runs"
-            ]
-        },
-        "Baal Militis": {
-            "map": "Zone Kalendae",
-            "items": [
-                "Repeated Runs"
-            ]
-        },
-        "Garuda Militis": {
-            "map": "Zone Liber",
-            "items": [
-                "Repeated Runs"
-            ]
-        }
+    "Paradoxical Gate": {
+      "map": "Zone Eletio",
+      "items": [
+        "Flameborne Astra",
+        "Repeated Runs"
+      ]
     },
-    "通常": {
-        "任意": {
-            "map": "None",
-            "items": [
-                "Repeated Runs"
-            ]
-        }
+    "Blazing Everwing": {
+      "map": "Zone Eletio",
+      "items": [
+        "Devil Idean",
+        "Repeated Runs"
+      ]
     },
-    "暂停休息": {
-        "Any": {
-            "map": "None",
-            "items": [
-                "分钟",
-                "Repeated Runs"
-            ]
-        }
+    "Death Seer": {
+      "map": "Zone Eletio",
+      "items": [
+        "Supreme Merit",
+        "Repeated Runs"
+      ]
+    },
+    "Hundred-Armed Hulk": {
+      "map": "Zone Eletio",
+      "items": [
+        "Star Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Terror Trifecta": {
+      "map": "Zone Eletio",
+      "items": [
+        "Fire Quartz",
+        "Repeated Runs"
+      ]
+    },
+    "Rageborn One": {
+      "map": "Zone Eletio",
+      "items": [
+        "Sun Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Trident Grandmaster": {
+      "map": "Zone Faym",
+      "items": [
+        "Water Verum Proof",
+        "Repeated Runs"
+      ]
+    },
+    "Hoarfrost Icequeen": {
+      "map": "Zone Faym",
+      "items": [
+        "Justice Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Oceanic Archon": {
+      "map": "Zone Faym",
+      "items": [
+        "Sephira Stone",
+        "Repeated Runs"
+      ]
+    },
+    "Farsea Predator": {
+      "map": "Zone Faym",
+      "items": [
+        "Supreme Merit",
+        "Repeated Runs"
+      ]
+    },
+    "Faymian Fortress": {
+      "map": "Zone Faym",
+      "items": [
+        "Moon Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Draconic Simulacrum": {
+      "map": "Zone Faym",
+      "items": [
+        "Darkborne Astra",
+        "Repeated Runs"
+      ]
+    },
+    "Azureflame Dragon": {
+      "map": "Zone Faym",
+      "items": [
+        "Aquaborne Astra",
+        "Repeated Runs"
+      ]
+    },
+    "Eyes of Sorrow": {
+      "map": "Zone Faym",
+      "items": [
+        "Water Quartz",
+        "Repeated Runs"
+      ]
+    },
+    "Mad Shearwielder": {
+      "map": "Zone Faym",
+      "items": [
+        "Death Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Avatar of Avarice": {
+      "map": "Zone Goliath",
+      "items": [
+        "Earthborne Astra",
+        "Repeated Runs"
+      ]
+    },
+    "Temptation's Guide": {
+      "map": "Zone Goliath",
+      "items": [
+        "Supreme Merit",
+        "Repeated Runs"
+      ]
+    },
+    "World's Veil": {
+      "map": "Zone Goliath",
+      "items": [
+        "Hanged Man Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Goliath Keeper": {
+      "map": "Zone Goliath",
+      "items": [
+        "Earth Quartz",
+        "Repeated Runs"
+      ]
+    },
+    "Bloodstained Barbarian": {
+      "map": "Zone Goliath",
+      "items": [
+        "Sephira Stone",
+        "Repeated Runs"
+      ]
+    },
+    "Frenzied Howler": {
+      "map": "Zone Goliath",
+      "items": [
+        "Darkborne Astra",
+        "Repeated Runs"
+      ]
+    },
+    "Goliath Vanguard": {
+      "map": "Zone Goliath",
+      "items": [
+        "Tower Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Vestige of Truth": {
+      "map": "Zone Goliath",
+      "items": [
+        "Earth Verum Proof",
+        "Repeated Runs"
+      ]
+    },
+    "Writhing Despair": {
+      "map": "Zone Goliath",
+      "items": [
+        "Death Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Vengeful Demigod": {
+      "map": "Zone Harbinger",
+      "items": [
+        "Sephira Stone",
+        "Repeated Runs"
+      ]
+    },
+    "Dirgesinger": {
+      "map": "Zone Harbinger",
+      "items": [
+        "Supreme Merit",
+        "Repeated Runs"
+      ]
+    },
+    "Wildwind Conjurer/Fullthunder Conjurer": {
+      "map": "Zone Harbinger",
+      "items": [
+        "Judgement Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Harbinger Simurgh": {
+      "map": "Zone Harbinger",
+      "items": [
+        "Temperance Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Harbinger Hardwood": {
+      "map": "Zone Harbinger",
+      "items": [
+        "Wind Verum Proof",
+        "Repeated Runs"
+      ]
+    },
+    "Demanding Stormgod": {
+      "map": "Zone Harbinger",
+      "items": [
+        "Windborne Astra",
+        "Repeated Runs"
+      ]
+    },
+    "Harbinger Tyrant": {
+      "map": "Zone Harbinger",
+      "items": [
+        "Lightborne Astra",
+        "Repeated Runs"
+      ]
+    },
+    "Phantasmagoric Aberration": {
+      "map": "Zone Harbinger",
+      "items": [
+        "Light Quartz",
+        "Repeated Runs"
+      ]
+    },
+    "Dimensional Riftwalker": {
+      "map": "Zone Harbinger",
+      "items": [
+        "Star Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Infernal Hellbeast": {
+      "map": "Zone Invidia",
+      "items": [
+        "Sephira Stone",
+        "Flameborne Astra",
+        "Devil Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Spikeball": {
+      "map": "Zone Invidia",
+      "items": [
+        "Sephira Stone",
+        "Flameborne Astra",
+        "Sun Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Blushing Groom": {
+      "map": "Zone Invidia",
+      "items": [
+        "Sephira Stone",
+        "Flameborne Astra",
+        "Devil Idean",
+        "Sun Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Unworldly Guardian": {
+      "map": "Zone Invidia",
+      "items": [
+        "Sephira Stone",
+        "Lightborne Astra",
+        "Star Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Deva of Wisdom": {
+      "map": "Zone Invidia",
+      "items": [
+        "Sephira Stone",
+        "Lightborne Astra",
+        "Star Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Sword of Aberration": {
+      "map": "Zone Invidia",
+      "items": [
+        "Sephira Stone",
+        "Lightborne Astra",
+        "Star Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Glacial Hellbeast": {
+      "map": "Zone Joculator",
+      "items": [
+        "Sephira Stone",
+        "Aquaborne Astra",
+        "Justice Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Giant Sea Plant": {
+      "map": "Zone Joculator",
+      "items": [
+        "Sephira Stone",
+        "Aquaborne Astra",
+        "Moon Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Maiden of the Depths": {
+      "map": "Zone Joculator",
+      "items": [
+        "Sephira Stone",
+        "Aquaborne Astra",
+        "Justice Idean",
+        "Moon Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Bloody Soothsayer": {
+      "map": "Zone Joculator",
+      "items": [
+        "Sephira Stone",
+        "Darkborne Astra",
+        "Death Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Nebulous One": {
+      "map": "Zone Joculator",
+      "items": [
+        "Sephira Stone",
+        "Darkborne Astra",
+        "Death Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Dreadful Scourge": {
+      "map": "Zone Joculator",
+      "items": [
+        "Sephira Stone",
+        "Darkborne Astra",
+        "Death Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Bedeviled Plague": {
+      "map": "Zone Kalendae",
+      "items": [
+        "Sephira Stone",
+        "Earthborne Astra",
+        "Hanged Man Idean",
+        "Tower Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Xeno Vohu Manah Militis": {
+      "map": "Zone Kalendae",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "Tainted Hellmaiden": {
+      "map": "Zone Kalendae",
+      "items": [
+        "Sephira Stone",
+        "Earthborne Astra",
+        "Hanged Man Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Watcher from Above": {
+      "map": "Zone Kalendae",
+      "items": [
+        "Sephira Stone",
+        "Earthborne Astra",
+        "Tower Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Scintillant Matter": {
+      "map": "Zone Kalendae",
+      "items": [
+        "Sephira Stone",
+        "Darkborne Astra",
+        "Death Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Ebony Executioner": {
+      "map": "Zone Kalendae",
+      "items": [
+        "Sephira Stone",
+        "Darkborne Astra",
+        "Death Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Hellbeast of Doom": {
+      "map": "Zone Kalendae",
+      "items": [
+        "Sephira Stone",
+        "Darkborne Astra",
+        "Death Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Mounted Toxophilite": {
+      "map": "Zone Liber",
+      "items": [
+        "Sephira Stone",
+        "Windborne Astra",
+        "Temperance Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Beetle of Damnation": {
+      "map": "Zone Liber",
+      "items": [
+        "Sephira Stone",
+        "Windborne Astra",
+        "Temperance Idean",
+        "Judgement Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Ageless Guardian Beast": {
+      "map": "Zone Liber",
+      "items": [
+        "Sephira Stone",
+        "Windborne Astra",
+        "Judgement Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Solar Princess": {
+      "map": "Zone Liber",
+      "items": [
+        "Sephira Stone",
+        "Lightborne Astra",
+        "Star Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Drifting Blade Demon": {
+      "map": "Zone Liber",
+      "items": [
+        "Sephira Stone",
+        "Lightborne Astra",
+        "Star Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Simpering Beast": {
+      "map": "Zone Liber",
+      "items": [
+        "Sephira Stone",
+        "Lightborne Astra",
+        "Star Idean",
+        "Repeated Runs"
+      ]
+    },
+    "Eletion Glider": {
+      "map": "Zone Eletio",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "Faymian Gun": {
+      "map": "Zone Faym",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "Goliath Triune": {
+      "map": "Zone Goliath",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "Harbinger Stormer": {
+      "map": "Zone Harbinger",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "Athena Militis": {
+      "map": "Zone Invidia",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "Grani Militis": {
+      "map": "Zone Joculator",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "Baal Militis": {
+      "map": "Zone Kalendae",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "Garuda Militis": {
+      "map": "Zone Liber",
+      "items": [
+        "Repeated Runs"
+      ]
     }
+  },
+  "转世": {
+    "Point Aquila": {
+      "map": "Expedition",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "Point Bellator": {
+      "map": "Expedition",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "Point Celsus": {
+      "map": "Expedition",
+      "items": [
+        "Repeated Runs"
+      ]
+    }
+  },
+  "任务": {
+    "Scattered Cargo": {
+      "map": "Port Breeze Archipelago",
+      "items": [
+        "Satin Feather",
+        "Zephyr Feather",
+        "Flying Sprout"
+      ]
+    },
+    "Lucky Charm Hunt": {
+      "map": "Valtz Duchy",
+      "items": [
+        "Fine Sand Bottle",
+        "Untamed Flame",
+        "Blistering Ore"
+      ]
+    },
+    "Special Op's Request": {
+      "map": "Valtz Duchy",
+      "items": [
+        "Fine Sand Bottle",
+        "Untamed Flame",
+        "Blistering Ore"
+      ]
+    },
+    "Threat to the Fisheries": {
+      "map": "Auguste Isles",
+      "items": [
+        "Fresh Water Jug",
+        "Soothing Splash",
+        "Glowing Coral"
+      ]
+    },
+    "The Fruit of Lumacie": {
+      "map": "Lumacie Archipelago",
+      "items": [
+        "Rough Stone",
+        "Swirling Amber",
+        "Coarse Alluvium"
+      ]
+    },
+    "Whiff of Danger": {
+      "map": "Lumacie Archipelago",
+      "items": [
+        "Rough Stone",
+        "Swirling Amber",
+        "Coarse Alluvium"
+      ]
+    },
+    "I Challenge You!": {
+      "map": "Albion Citadel",
+      "items": [
+        "Falcon Feather",
+        "Spring Water Jug",
+        "Vermilion Stone"
+      ]
+    },
+    "For Whom the Bell Tolls": {
+      "map": "Mist-Shrouded Isle",
+      "items": [
+        "Slimy Shroom",
+        "Hollow Soul",
+        "Lacrimosa"
+      ]
+    },
+    "Golonzo's Battles of Old": {
+      "map": "Golonzo Island",
+      "items": [
+        "Wheat Stalk",
+        "Iron Cluster",
+        "Olea Plant"
+      ]
+    },
+    "The Dungeon Diet": {
+      "map": "Amalthea Island",
+      "items": [
+        "Indigo Fruit",
+        "Foreboding Clover",
+        "Blood Amber"
+      ]
+    },
+    "Trust Busting Dustup": {
+      "map": "Former Capital Mephorash",
+      "items": [
+        "Sand Brick",
+        "Native Reed"
+      ]
+    },
+    "Erste Kingdom Episode 4": {
+      "map": "Former Capital Mephorash",
+      "items": [
+        "Antique Cloth"
+      ]
+    },
+    "Imperial Wanderer's Soul": {
+      "map": "Agastia",
+      "items": [
+        "Prosperity Flame",
+        "Explosive Material",
+        "Steel Liquid"
+      ]
+    },
+    "Rocket Raid": {
+      "map": "Agastia",
+      "items": [
+        "Steel Liquid"
+      ]
+    },
+    "Stocking Up for Winter": {
+      "map": "Merkmal Island",
+      "items": [
+        "Merkmal Fig",
+        "Bastion Block",
+        "Corroded Cartridge"
+      ]
+    },
+    "The Mysterious Room": {
+      "map": "Merkmal Island",
+      "items": [
+        "Bastion Block"
+      ]
+    },
+    "The Right of Might": {
+      "map": "Groz Island",
+      "items": [
+        "Raw Gemstone"
+      ]
+    },
+    "Pholia the Maiden Episode 1": {
+      "map": "Groz Island",
+      "items": [
+        "Riot Root"
+      ]
+    },
+    "Pholia the Maiden Episode 3": {
+      "map": "Groz Island",
+      "items": [
+        "Riot Root"
+      ]
+    },
+    "Teachings of the Sage Episode 2": {
+      "map": "Kluger Island",
+      "items": [
+        "Gray Sandstone",
+        "Kluger Herb",
+        "Meditative Sutra"
+      ]
+    },
+    "Isle of Primals Episode 3": {
+      "map": "Bestia Island",
+      "items": [
+        "Jumbo Beast Bone",
+        "Bestia Fruit",
+        "Toxic Tulip"
+      ]
+    },
+    "Deception's Inception Episode 4": {
+      "map": "Bestia Island",
+      "items": [
+        "Jumbo Beast Bone",
+        "Bestia Fruit",
+        "Toxic Tulip"
+      ]
+    },
+    "Be All You Can Be": {
+      "map": "Reiche Island",
+      "items": [
+        "Rhem Pepper",
+        "Rusty Eave",
+        "Translucent Silk"
+      ]
+    },
+    "Once Lost, Once Found": {
+      "map": "Starke Island",
+      "items": [
+        "Broken Teacup",
+        "Dusty Book"
+      ]
+    },
+    "A Girl Named Mika Episode 2": {
+      "map": "The Edgelands",
+      "items": [
+        "Converging Rays"
+      ]
+    },
+    "House of Happiness": {
+      "map": "New Utopia",
+      "items": [
+        "Converging Rays",
+        "Meditative Sutra",
+        "Jumbo Beast Bone"
+      ]
+    }
+  },
+  "特殊": {
+    "N Fire Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Fire Orb",
+        "Inferno Orb",
+        "Red Tome",
+        "Hellfire Scroll",
+        "Infernal Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "Red Dragon Scale",
+        "Hellfire Fragment"
+      ]
+    },
+    "H Fire Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Fire Orb",
+        "Inferno Orb",
+        "Red Tome",
+        "Hellfire Scroll",
+        "Infernal Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "Red Dragon Scale",
+        "Hellfire Fragment"
+      ]
+    },
+    "VH Fire Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Fire Orb",
+        "Inferno Orb",
+        "Red Tome",
+        "Hellfire Scroll",
+        "Infernal Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "Red Dragon Scale",
+        "Hellfire Fragment"
+      ]
+    },
+    "N Water Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Water Orb",
+        "Frost Orb",
+        "Blue Tome",
+        "Flood Scroll",
+        "Tidal Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "Blue Dragon Scale",
+        "Deluge Fragment"
+      ]
+    },
+    "H Water Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Water Orb",
+        "Frost Orb",
+        "Blue Tome",
+        "Flood Scroll",
+        "Tidal Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "Blue Dragon Scale",
+        "Deluge Fragment"
+      ]
+    },
+    "VH Water Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Water Orb",
+        "Frost Orb",
+        "Blue Tome",
+        "Flood Scroll",
+        "Tidal Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "Blue Dragon Scale",
+        "Deluge Fragment"
+      ]
+    },
+    "N Earth Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Earth Orb",
+        "Rumbling Orb",
+        "Brown Tome",
+        "Thunder Scroll",
+        "Seismic Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "Brown Dragon Scale",
+        "Wasteland Fragment"
+      ]
+    },
+    "H Earth Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Earth Orb",
+        "Rumbling Orb",
+        "Brown Tome",
+        "Thunder Scroll",
+        "Seismic Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "Brown Dragon Scale",
+        "Wasteland Fragment"
+      ]
+    },
+    "VH Earth Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Earth Orb",
+        "Rumbling Orb",
+        "Brown Tome",
+        "Thunder Scroll",
+        "Seismic Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "Brown Dragon Scale",
+        "Wasteland Fragment"
+      ]
+    },
+    "N Wind Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Wind Orb",
+        "Cyclone Orb",
+        "Green Tome",
+        "Gale Scroll",
+        "Tempest Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "Green Dragon Scale",
+        "Typhoon Fragment"
+      ]
+    },
+    "H Wind Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Wind Orb",
+        "Cyclone Orb",
+        "Green Tome",
+        "Gale Scroll",
+        "Tempest Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "Green Dragon Scale",
+        "Typhoon Fragment"
+      ]
+    },
+    "VH Wind Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Wind Orb",
+        "Cyclone Orb",
+        "Green Tome",
+        "Gale Scroll",
+        "Tempest Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "Green Dragon Scale",
+        "Typhoon Fragment"
+      ]
+    },
+    "N Light Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Light Orb",
+        "Shining Orb",
+        "White Tome",
+        "Skylight Scroll",
+        "Radiant Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "White Dragon Scale"
+      ]
+    },
+    "H Light Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Light Orb",
+        "Shining Orb",
+        "White Tome",
+        "Skylight Scroll",
+        "Radiant Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "White Dragon Scale"
+      ]
+    },
+    "VH Light Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Light Orb",
+        "Shining Orb",
+        "White Tome",
+        "Skylight Scroll",
+        "Radiant Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "White Dragon Scale"
+      ]
+    },
+    "N Dark Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Dark Orb",
+        "Abysm Orb",
+        "Black Tome",
+        "Chasm Scroll",
+        "Umbral Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "Black Dragon Scale"
+      ]
+    },
+    "H Dark Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Dark Orb",
+        "Abysm Orb",
+        "Black Tome",
+        "Chasm Scroll",
+        "Umbral Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "Black Dragon Scale"
+      ]
+    },
+    "VH Dark Trial": {
+      "map": "Uncap Treasure Quests",
+      "items": [
+        "Dark Orb",
+        "Abysm Orb",
+        "Black Tome",
+        "Chasm Scroll",
+        "Umbral Whorl",
+        "Prism Chip",
+        "Flawed Prism",
+        "Flawless Prism",
+        "Rainbow Prism",
+        "Black Dragon Scale"
+      ]
+    },
+    "N Shiny Slime Search!": {
+      "map": "Shiny Slime Search!",
+      "items": [
+        "EXP"
+      ]
+    },
+    "H Shiny Slime Search!": {
+      "map": "Shiny Slime Search!",
+      "items": [
+        "EXP"
+      ]
+    },
+    "VH Shiny Slime Search!": {
+      "map": "Shiny Slime Search!",
+      "items": [
+        "EXP"
+      ]
+    },
+    "EX Ifrit Showdown": {
+      "map": "Showdowns",
+      "items": [
+        "Jasper Scale",
+        "Scorching Peak",
+        "Infernal Garnet",
+        "Ifrit Anima",
+        "Ifrit Omega Anima"
+      ]
+    },
+    "EX Cocytus Showdown": {
+      "map": "Showdowns",
+      "items": [
+        "Mourning Stone",
+        "Crystal Spirit",
+        "Frozen Hell Prism",
+        "Cocytus Anima",
+        "Cocytus Omega Anima"
+      ]
+    },
+    "EX Vohu Manah Showdown": {
+      "map": "Showdowns",
+      "items": [
+        "Scrutiny Stone",
+        "Luminous Judgment",
+        "Evil Judge Crystal",
+        "Vohu Manah Anima",
+        "Vohu Manah Omega Anima"
+      ]
+    },
+    "EX Sagittarius Showdown": {
+      "map": "Showdowns",
+      "items": [
+        "Sagittarius Arrowhead",
+        "Sagittarius Rune",
+        "Horseman's Plate",
+        "Sagittarius Anima",
+        "Sagittarius Omega Anima"
+      ]
+    },
+    "EX Corow Showdown": {
+      "map": "Showdowns",
+      "items": [
+        "Solar Ring",
+        "Sunlight Quartz",
+        "Halo Light Quartz",
+        "Corow Anima",
+        "Corow Omega Anima"
+      ]
+    },
+    "EX Diablo Showdown": {
+      "map": "Showdowns",
+      "items": [
+        "Twilight Cloth Strip",
+        "Shadow Silver",
+        "Phantom Demon Jewel",
+        "Diablo Anima",
+        "Diablo Omega Anima"
+      ]
+    },
+    "N Angel Halo": {
+      "map": "Angel Halo",
+      "items": [
+        "Angel Halo Weapons"
+      ]
+    },
+    "H Angel Halo": {
+      "map": "Angel Halo",
+      "items": [
+        "Angel Halo Weapons"
+      ]
+    },
+    "VH Angel Halo": {
+      "map": "Angel Halo",
+      "items": [
+        "Angel Halo Weapons"
+      ]
+    },
+    "Campaign-Exclusive Quest": {
+      "map": "Campaign-Exclusive Quest",
+      "items": [
+        "Repeated Runs"
+      ]
+    }
+  },
+  "共斗": {
+    "H3-1 In a Dusk Dream": {
+      "items": [
+        "EXP"
+      ]
+    },
+    "EX1-1 Corridor of Puzzles": {
+      "items": [
+        "Warrior Creed",
+        "Mage Creed"
+      ]
+    },
+    "EX1-3 Lost in the Dark": {
+      "items": [
+        "Warrior Creed",
+        "Mage Creed"
+      ]
+    },
+    "EX2-2 Time of Judgement": {
+      "items": [
+        "Keraunos Replica",
+        "Faust Replica",
+        "Mage Distinction",
+        "Pilgrim Distinction",
+        "Alchemist Distinction",
+        "Monk's Distinction",
+        "Evil Judge Crystal"
+      ]
+    },
+    "EX2-3 Time of Revelation": {
+      "items": [
+        "Avenger Replica",
+        "Hellion Gauntlet Replica",
+        "Gladiator Distinction",
+        "Fencer Distinction",
+        "Dual Wielder Distinction",
+        "Forester's Distinction",
+        "Infernal Garnet"
+      ]
+    },
+    "EX2-4 Time of Eminence": {
+      "items": [
+        "Nirvana Replica",
+        "Romulus Spear Replica",
+        "Murakumo Replica",
+        "Bandit Distinction",
+        "Troubadour Distinction",
+        "Mystic Distinction",
+        "Shredder Distinction",
+        "Contractor Distinction",
+        "Halo Light Quartz"
+      ]
+    },
+    "EX3-2 Rule of the Tundra": {
+      "items": [
+        "Frozen Hell Prism",
+        "Guardian Distinction",
+        "Combatant Distinction",
+        "Sword Master Distinction",
+        "Dragoon's Distinction",
+        "Skofnung Replica",
+        "Langeleik Replica",
+        "Kapilavastu Replica"
+      ]
+    },
+    "EX3-3 Rule of the Plains": {
+      "items": [
+        "Oliver Replica",
+        "Rosenbogen Replica",
+        "Sharpshooter Distinction",
+        "Gunslinger Distinction",
+        "Cavalryman Distinction",
+        "Longstrider's Distinction",
+        "Horseman's Plate"
+      ]
+    },
+    "EX3-4 Rule of the Twilight": {
+      "items": [
+        "Ipetam Replica",
+        "Muramasa Replica",
+        "Proximo Replica",
+        "Samurai Distinction",
+        "Assassin Distinction",
+        "Ninja Distinction",
+        "Dancer Distinction",
+        "Phantom Demon Jewel"
+      ]
+    },
+    "EX4-2 Amidst the Waves": {
+      "items": [
+        "Oliver Replica",
+        "Romulus Spear Replica",
+        "Kapilavastu Replica",
+        "Mystic Distinction",
+        "Pilgrim Distinction",
+        "Alchemist Distinction",
+        "Mage Distinction",
+        "Monk's Distinction"
+      ]
+    },
+    "EX4-3 Amidst the Petals": {
+      "items": [
+        "Langeleik Replica",
+        "Faust Replica",
+        "Misericorde Replica",
+        "Arabesque Replica",
+        "Ninja Distinction",
+        "Samurai Distinction",
+        "Sharpshooter Distinction",
+        "Gunslinger Distinction",
+        "Longstrider's Distinction",
+        "Dancer Distinction"
+      ]
+    },
+    "EX4-4 Amidst Severe Cliffs": {
+      "items": [
+        "Hellion Gauntlet Replica",
+        "Muramasa Replica",
+        "Aschallon Replica",
+        "Practice Drum",
+        "Combatant Distinction",
+        "Gladiator Distinction",
+        "Sword Master Distinction",
+        "Fencer Distinction"
+      ]
+    },
+    "EX4-5 Amidst the Flames": {
+      "items": [
+        "Ipetam Replica",
+        "Murakumo Replica",
+        "Nebuchad Replica",
+        "Proximo Replica",
+        "Guardian Distinction",
+        "Cavalryman Distinction",
+        "Bandit Distinction",
+        "Troubadour Distinction",
+        "Dragoon's Distinction",
+        "Contractor Distinction"
+      ]
+    },
+    "EX5-1 Throes of Sorcery": {
+      "items": [
+        "Warrior Creed"
+      ]
+    },
+    "EX5-2 Throes of Spears": {
+      "items": [
+        "Warrior Creed"
+      ]
+    },
+    "EX5-3 Throes of Wings": {
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "EX5-4 Throes of Calamity": {
+      "items": [
+        "Warrior Creed"
+      ]
+    },
+    "EX6-1 Throes of Dark Steel": {
+      "items": [
+        "Warrior Creed"
+      ]
+    },
+    "EX6-2 Throes of Death": {
+      "items": [
+        "Warrior Creed"
+      ]
+    }
+  },
+  "多人": {
+    "Lvl 50 风妈": {
+      "map": "Tiamat Omega",
+      "items": [
+        "Tiamat Omega"
+      ]
+    }
+  },
+  "兑换活动": {
+    "EX Event Quest": {
+      "map": "Event Quest",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "EX+ Event Quest": {
+      "map": "Event Quest",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "VH Event Raid": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "EX Event Raid": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "EX+ Event Raid": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    }
+  },
+  "战货活动": {
+    "EX Event Quest": {
+      "map": "Event Quest",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "VH Event Raid": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "EX Event Raid": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "IM Event Raid": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    }
+  },
+  "快速活动": {
+    "Quest": {
+      "map": "Event Quest",
+      "items": [
+        "Repeated Runs"
+      ]
+    }
+  },
+  "四象降临": {
+    "VH Zhuque": {
+      "map": "Event Quest",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "VH Xuanwu": {
+      "map": "Event Quest",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "VH Baihu": {
+      "map": "Event Quest",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "VH Qinglong": {
+      "map": "Event Quest",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "EX Zhuque": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "EX Xuanwu": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "EX Baihu": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "EX Qinglong": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "Lvl 100 Shenxian": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    }
+  },
+  "古战场": {
+    "Extreme": {
+      "map": "Event Quest",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "Extreme+": {
+      "map": "Event Quest",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "NM90": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "NM95": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "NM100": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "NM150": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "NM200": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    }
+  },
+  "公会战": {
+    "1 Star": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "2 Star": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "3 Star": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "4 Star": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "5 Star": {
+      "map": "Event Raid",
+      "items": [
+        "Repeated Runs"
+      ]
+    }
+  },
+  "勇气之地": {
+    "Extreme": {
+      "map": "Event Quest",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "Extreme+": {
+      "map": "Event Quest",
+      "items": [
+        "Repeated Runs"
+      ]
+    }
+  },
+  "六道": {
+    "火六道 Extreme": {
+      "map": "Showdowns",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "水六道 Extreme": {
+      "map": "Showdowns",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "土六道 Extreme": {
+      "map": "Showdowns",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "风六道 Extreme": {
+      "map": "Showdowns",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "光六道 Extreme": {
+      "map": "Showdowns",
+      "items": [
+        "Repeated Runs"
+      ]
+    },
+    "暗六道 Extreme": {
+      "map": "Showdowns",
+      "items": [
+        "Repeated Runs"
+      ]
+    }
+  },
+  "Side Story": {
+    "Side Story": {
+      "map": "side story",
+      "items": [
+        "Repeated Runs"
+      ]
+    }
+  },
+  "通常": {
+    "任意": {
+      "map": "None",
+      "items": [
+        "Repeated Runs"
+      ]
+    }
+  },
+  "暂停休息": {
+    "Any": {
+      "map": "None",
+      "items": [
+        "分钟",
+        "Repeated Runs"
+      ]
+    }
+  }
 }

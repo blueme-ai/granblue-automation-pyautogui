@@ -34,6 +34,9 @@ _TAURI_DIR = os.path.join(_REPO_ROOT, "src-tauri")
 _SCRIPTS_DIR = os.path.join(_TAURI_DIR, "scripts")
 _DATA_DIR = os.path.join(_GUI_DIR, "data")
 
+# 這些模式的後端仍依賴 harjeb 的瀏覽器書籤快捷鍵（多人另需找房服務），尚未改回原版導航
+BROKEN_MODES = {"多人", "快速活动", "Side Story"}
+
 
 def _load_json(name: str) -> dict:
     with open(os.path.join(_DATA_DIR, name), encoding = "utf-8") as f:
@@ -256,19 +259,6 @@ class MainWindow(QWidget):
         self.anti_detect_check = QCheckBox()
         window_grid.addWidget(self.static_window_check)
         window_grid.addWidget(self.anti_detect_check)
-        row = QHBoxLayout()
-        self.rotb_first_label = QLabel()
-        self.rotb_first_combo = QComboBox()
-        self.rotb_first_combo.addItems(["1", "2", "3", "4"])
-        self.rotb_method_label = QLabel()
-        self.rotb_method_combo = QComboBox()
-        self.rotb_method_combo.addItems(["1", "2", "3"])
-        row.addWidget(self.rotb_first_label)
-        row.addWidget(self.rotb_first_combo)
-        row.addWidget(self.rotb_method_label)
-        row.addWidget(self.rotb_method_combo)
-        row.addStretch()
-        window_grid.addLayout(row)
         settings_layout.addWidget(self.window_group)
         settings_layout.addStretch()
 
@@ -304,9 +294,12 @@ class MainWindow(QWidget):
         for i in range(self.mode_combo.count()):
             zh_name = self.mode_combo.itemData(i)
             if i18n.current_language == "en":
-                self.mode_combo.setItemText(i, self.translate_dict.get(zh_name, zh_name))
+                text = self.translate_dict.get(zh_name, zh_name)
             else:
-                self.mode_combo.setItemText(i, zh_name)
+                text = zh_name
+            if zh_name in BROKEN_MODES:
+                text += " (unavailable)" if i18n.current_language == "en" else "（待重做，暫不可用）"
+            self.mode_combo.setItemText(i, text)
 
         self.run_group.setTitle(tr("執行選項"))
         self.bezier_check.setText(tr("模擬人類滑鼠移動"))
@@ -331,9 +324,6 @@ class MainWindow(QWidget):
         self.window_group.setTitle(tr("視窗與安全"))
         self.static_window_check.setText(tr("靜態視窗校準（執行中不可移動遊戲視窗）"))
         self.anti_detect_check.setText(tr("防偵測（每輪結束把滑鼠移出視窗）"))
-        self.rotb_first_label.setText(tr("ROTB 首選"))
-        self.rotb_first_combo.setToolTip(tr("1=朱雀 2=玄武 3=白虎 4=青龍"))
-        self.rotb_method_label.setText(tr("ROTB 方式"))
 
         self._refresh_task_list()
 
@@ -450,8 +440,6 @@ class MainWindow(QWidget):
             "auto_exit_minutes": self.auto_exit_spin.value(),
             "no_timeout": self.no_timeout_check.isChecked(),
             "hp_remain": self.hp_spin.value(),
-            "rotb_first": int(self.rotb_first_combo.currentText()),
-            "rotb_method": int(self.rotb_method_combo.currentText()),
         }
 
     def _toggle_run(self):
