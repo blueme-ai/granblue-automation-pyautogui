@@ -641,6 +641,16 @@ class Game:
             # found or tries are depleted.
             set_location = None
             if Settings.farming_mode == "Arcarum Sandbox":
+                # 新版遊戲點沙盒節點後會記住上次隊伍、直接跳到隊伍/召喚確認畫面
+                # （只有一顆 OK 鈕），不再顯示 Set A/B/Extra 選擇畫面。
+                # 先偵測確認畫面：有 OK 鈕就直接開打，跳過 Set 選擇。
+                if Game.find_and_click_button("party_selection_ok", tries = 3, suppress_error = True) \
+                        or Game.find_and_click_button("ok", tries = 2, suppress_error = True):
+                    MessageLog.print_message("\n[INFO] 沙盒隊伍已預選，直接按 OK 開始戰鬥。")
+                    Settings.party_selection_first_run = False
+                    Game.wait(3.0)
+                    return True
+
                 while set_location is None:
                     set_location = ImageUtils.find_button("party_set_extra", tries = 10)
                     if set_location is None:
