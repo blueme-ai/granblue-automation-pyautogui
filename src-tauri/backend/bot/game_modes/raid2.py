@@ -1,3 +1,5 @@
+import os
+
 from utils.settings import Settings
 from utils.message_log import MessageLog
 from utils.image_utils import ImageUtils
@@ -35,10 +37,17 @@ class Raid:
         if Game.check_for_pending():
             Game.go_back_home()
 
-        # Backup 圖示會閃爍（紅/黃兩態＋發光動畫），信心值放寬並手動點擊
+        # Backup 圖示外觀會隨狀態改變（紅菱形/黃緞帶/…＋發光動畫）。
+        # 自動嘗試 images/buttons/raid_backup*.jpg 全部變體——遇到新樣子時
+        # 從 debug 截圖裁一張存成 raid_backup_<名字>.jpg 即可，不用改程式。
+        import glob as _glob
+        variants = sorted(
+            os.path.basename(p)[:-4].lower()
+            for p in _glob.glob(os.path.join(ImageUtils._current_dir, "images", "buttons", "raid_backup*.jpg"))
+        )
         backup_location = None
         for _ in range(4):
-            for variant in ("raid_backup_red", "raid_backup"):
+            for variant in variants:
                 backup_location = ImageUtils.find_button(variant, custom_confidence = 0.70, tries = 1, suppress_error = True)
                 if backup_location is not None:
                     break
