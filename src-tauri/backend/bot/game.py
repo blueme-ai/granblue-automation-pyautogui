@@ -442,13 +442,22 @@ class Game:
 
     @staticmethod
     def select_summon(summon_list: List[str], summon_element_list: List[str]):
-        """選擇支援召喚石。優先用遊戲內建的自動選擇按鈕（需 summon_auto_select 模板，
-        待截圖製作）；沒有模板時，summonDefault 開啟或未指定清單就直接選第一顆，
-        否則用圖像匹配找指定的召喚石（原版行為）。"""
+        """選擇支援召喚石，優先利用遊戲內建的自動選擇：
+
+        1. 遊戲設定開了「自動選擇召喚」→ 進戰鬥會直接跳出已選好召喚石的
+           隊伍確認框（框內有 Auto Select 鈕）→ 偵測到就不用選，交給後續
+           find_party_and_start_mission 按 OK
+        2. 沒開設定 → 召喚列表右上有 Auto Pick 鈕 → 點了會自動選好並
+           進入隊伍確認框
+        3. 都沒有 → summonDefault 開啟或未指定清單就直接選第一顆，
+           否則用圖像匹配找指定的召喚石（原版行為）
+        """
         if ImageUtils.find_button("summon_auto_select", tries = 1, suppress_error = True) is not None:
-            MessageLog.print_message("\n[INFO] 使用遊戲內建的自動選擇召喚石...")
-            Game.find_and_click_button("summon_auto_select")
-            Game.wait(1.0)
+            MessageLog.print_message("\n[INFO] 遊戲已自動選好召喚石（偵測到隊伍確認框），直接繼續...")
+            return True
+        if Game.find_and_click_button("summon_auto_pick", tries = 1, suppress_error = True):
+            MessageLog.print_message("\n[INFO] 使用召喚列表的 Auto Pick 自動選擇...")
+            Game.wait(2.0)
             return True
         if Settings.summon_default or len(summon_list) == 0:
             return Game.select_default_summon()
