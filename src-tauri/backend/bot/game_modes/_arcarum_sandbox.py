@@ -557,11 +557,22 @@ class ArcarumSandbox:
         # 目前支援打中央 The World（主要素材本）：直接點該列右側的「>」箭頭
         # 開始，不需要左右節點導航。元素王（12 隻）需另外的元素選擇流程，尚未支援。
         if Settings.map_name == "Zone Mundus":
-            world_location = ImageUtils.find_button("arcarum_sandbox_the_world", tries = 5)
+            _s = ImageUtils._template_scale
+            # 進場預設選中中央 The World，底部列會顯示它；直接找該列。
+            world_location = ImageUtils.find_button("arcarum_sandbox_the_world", tries = 3, suppress_error = True)
+            if world_location is None:
+                # 底部沒顯示 The World（遊戲可能記住了上次選的其他節點）→
+                # 點地圖中央的 The World 球選中它再試。中央球相對 home_menu 的
+                # 偏移是 1 倍縮放量測 (-204, +207)，乘縮放比例。
+                MessageLog.print_message("[ARCARUM.SANDBOX] 底部未顯示 The World，點中央球重新選中...")
+                home_location = ImageUtils.find_button("home_menu", tries = 5)
+                if home_location is not None:
+                    MouseUtils.move_and_click_point(home_location[0] - int(204 * _s), home_location[1] + int(207 * _s), "arcarum_the_world_orb")
+                    Game.wait(2.0)
+                world_location = ImageUtils.find_button("arcarum_sandbox_the_world", tries = 5)
             if world_location is None:
                 raise ArcarumSandboxException("Failed to find The World mission row in Zone Mundus.")
             # 從「The World」文字中心往右到「>」箭頭的偏移（1 倍縮放量測，乘縮放比例）
-            _s = ImageUtils._template_scale
             MouseUtils.move_and_click_point(world_location[0] + int(235 * _s), world_location[1] + int(15 * _s), "arcarum_sandbox_the_world")
             Game.wait(3.0)
             return None
