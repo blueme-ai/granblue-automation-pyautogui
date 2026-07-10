@@ -18,7 +18,7 @@ class MouseUtils:
     if Settings.enable_bezier_curve_mouse_movement is False:
         pyautogui.MINIMUM_DURATION = 0
         pyautogui.MINIMUM_SLEEP = 0
-        pyautogui.PAUSE = 0.008
+        pyautogui.PAUSE = 0.003
 
 
 
@@ -66,9 +66,10 @@ class MouseUtils:
 
     @staticmethod
     def move(x, y):
-        """移動滑鼠。速度由 GUI 的「滑鼠移動速度」設定控制（預設 0.2 秒）；
-        勾選「模擬人類滑鼠移動」時用貝茲曲線軌跡，否則直線快速移動。"""
-        duration = max(float(Settings.custom_mouse_speed), 0.05)
+        """移動滑鼠。速度由 GUI 的「滑鼠移動速度」設定控制（預設 0.1 秒）；
+        勾選「模擬人類滑鼠移動」時用貝茲曲線軌跡，否則直線快速移動。
+        直線模式允許到 0（瞬移），多人搶救援時才點得夠快。"""
+        duration = max(float(Settings.custom_mouse_speed), 0.0)
         if Settings.enable_bezier_curve_mouse_movement:
             MouseUtils.hc.move((x, y), max(duration, 0.3))
         else:

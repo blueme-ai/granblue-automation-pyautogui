@@ -399,7 +399,9 @@ class CombatMode:
 
         MessageLog.print_message(f"Settings.enable_refresh_during_combat {Settings.enable_refresh_during_combat}" )
         MessageLog.print_message(f"Settings.enable_auto_quick_summon {Settings.enable_auto_quick_summon}")
-        if Settings.enable_refresh_during_combat and Settings.enable_auto_quick_summon:
+        # 進戰鬥先嘗試快速召喚（若設定有勾），再開始攻擊。
+        # 只看 auto_quick_summon，不再綁定 refresh_during_combat（原本兩者都要勾才會放）。
+        if Settings.enable_auto_quick_summon:
             MessageLog.print_message(f"[COMBAT] Automatically attempting to use Quick Summon...")
             CombatMode._quick_summon()
 

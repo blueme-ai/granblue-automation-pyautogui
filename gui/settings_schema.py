@@ -67,7 +67,7 @@ def build_settings(
         },
         "configuration": {
             "enableBezierCurveMouseMovement": opt.get("bezier_mouse", False),
-            "mouseSpeed": opt.get("mouse_speed", 0.2),
+            "mouseSpeed": opt.get("mouse_speed", 0.1),
             "enableDelayBetweenRuns": opt.get("delay_enabled", False),
             "delayBetweenRuns": opt.get("delay_seconds", 15),
             "enableRandomizedDelayBetweenRuns": opt.get("random_delay_enabled", False),
