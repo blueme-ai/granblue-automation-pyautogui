@@ -238,10 +238,10 @@ class RiseOfTheBeasts:
                     raise RiseOfTheBeastsException("There are no more Shenxian hosts left.")
 
             elif difficulty == "Extreme+":
+                # EX+（每日輪替本）：點橫幅就直接進召喚石選擇（用戶確認），
+                # 不需要再點舊版的中間按鈕。
                 MessageLog.print_message("[ROTB] Now hosting EX+ Quest...")
                 Game.find_and_click_button("extreme_p")
-                if Game.find_and_click_button("rotb_qinglong_p"):
-                    MessageLog.print_message(f"[ROTB] Now starting EX+ qinglong Raid...")
             else:
                 MessageLog.print_message(f"[ROTB] Now hosting {temp_mission_name} Quest...")
 
