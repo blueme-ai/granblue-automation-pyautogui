@@ -3,8 +3,17 @@
 import json
 import os
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QColor
+
+# 全域停止快捷鍵（機器人會搶滑鼠，需要不用滑鼠就能停的方式）。
+# keyboard 套件在 Windows 免額外權限；mac 需輔助使用權限，失敗時靜默略過。
+try:
+    import keyboard as _keyboard
+except ImportError:
+    _keyboard = None
+
+STOP_HOTKEY = "ctrl+alt+q"
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QCheckBox,
@@ -44,6 +53,8 @@ def _load_json(name: str) -> dict:
 
 
 class MainWindow(QWidget):
+    _hotkey_stop = Signal()
+
     def __init__(self):
         super().__init__()
         i18n.load_language()
@@ -62,6 +73,20 @@ class MainWindow(QWidget):
         self._build_ui()
         self._retranslate()
         self.resize(980, 620)
+
+        # 快捷鍵回呼在背景執行緒觸發，經 Signal 轉回 Qt 主執行緒處理
+        self._hotkey_stop.connect(self._on_hotkey_stop)
+        if _keyboard is not None:
+            try:
+                _keyboard.add_hotkey(STOP_HOTKEY, self._hotkey_stop.emit)
+            except Exception:
+                pass
+
+    def _on_hotkey_stop(self):
+        """全域停止快捷鍵：不經確認立即停止（緊急用，滑鼠被搶時的逃生口）。"""
+        if self.runner.is_running():
+            self.runner.stop()
+            self._append_log(tr("已透過快捷鍵 {k} 緊急停止。", k = STOP_HOTKEY.upper()))
 
     # ---------- UI 組裝 ----------
 
@@ -295,6 +320,7 @@ class MainWindow(QWidget):
         self.clear_button.setText(tr("清空列表"))
         self.task_list.setToolTip(tr("拖曳任務可重新排序"))
         self.start_button.setText(tr("停止") if self.runner.is_running() else tr("開始"))
+        self.start_button.setToolTip(tr("執行中可隨時按 {k} 緊急停止（不需切回本視窗）", k = STOP_HOTKEY.upper()))
 
         # 模式下拉選單依語言顯示（內部值不變）
         for i in range(self.mode_combo.count()):

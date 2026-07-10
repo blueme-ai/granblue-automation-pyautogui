@@ -35,8 +35,8 @@ class Raid:
         if Game.check_for_pending():
             Game.go_back_home()
 
-        if Game.find_and_click_button("raid_backup_red", tries = 2, suppress_error = True) \
-                or Game.find_and_click_button("raid_backup", tries = 2, suppress_error = True):
+        if Game.find_and_click_button("raid_backup_red", tries = 4, suppress_error = True) \
+                or Game.find_and_click_button("raid_backup", tries = 4, suppress_error = True):
             MessageLog.print_message("[RAID] 從首頁 Backup 捷徑進入救援列表...")
             Game.wait(2.0)
         else:
@@ -50,27 +50,26 @@ class Raid:
 
     @staticmethod
     def _select_pinned_raid():
-        """切換到指定的釘選分頁（關卡名「釘選1」～「釘選4」）。
+        """切換到指定的釘選位（關卡名「釘選1」～「釘選4」）。
 
-        救援列表頁結構：Recent／Finder 兩個大分頁，釘選介面在 Finder 分頁裡，
-        四個釘選位左上角標著 1st/2nd/3rd/4th。先按右上的圓形「Raid List」鈕
-        （raid_list_button，無論目前在哪個分頁都會進 Finder 檢視），
-        再點釘選位角標（raid_pin_1 ~ raid_pin_4）。
+        首頁 Backup 捷徑落地就是 Finder 檢視，四個釘選位左上角標著
+        1st/2nd/3rd/4th，直接點角標即可。角標在選中／未選中時外觀略有
+        差異，信心值放寬到 0.70（跨槽位混淆度實測僅 ~0.58，不會點錯）；
+        點到已選中的釘選無害。
+        注意：右上圓形「Raid List」鈕是自己開多人房用的，不能點。
         """
         from bot.game import Game
 
         if not Settings.mission_name.startswith("釘選"):
             return
 
-        # 進 Finder 檢視（已經在的話按了也無害）。
-        if Game.find_and_click_button("raid_list_button", tries = 3, suppress_error = True):
-            Game.wait(1.5)
-
         n = Settings.mission_name[-1]
-        if Game.find_and_click_button(f"raid_pin_{n}", tries = 3, suppress_error = True):
+        pin_location = ImageUtils.find_button(f"raid_pin_{n}", custom_confidence = 0.70, tries = 3, suppress_error = True)
+        if pin_location is not None:
+            MouseUtils.move_and_click_point(pin_location[0], pin_location[1], f"raid_pin_{n}")
             Game.wait(1.5)
         else:
-            MessageLog.print_message(f"[RAID] 找不到釘選位模板 raid_pin_{n}，沿用目前選中的釘選...")
+            MessageLog.print_message(f"[RAID] 找不到釘選位 {n} 的角標，沿用目前選中的釘選...")
 
     @staticmethod
     def _check_for_joined_raids():

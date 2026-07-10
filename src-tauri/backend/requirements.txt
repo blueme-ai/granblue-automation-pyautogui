@@ -23,6 +23,8 @@ websockets>=12.0
 
 # GUI（跨平台，Windows / Intel Mac / Apple Silicon 皆支援）
 PySide6>=6.6
+# 全域停止快捷鍵（mac 需在系統設定授權「輔助使用」）
+keyboard>=0.13
 
 # 僅 Windows 需要
 pywin32>=306; sys_platform == "win32"
