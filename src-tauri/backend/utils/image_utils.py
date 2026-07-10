@@ -60,6 +60,20 @@ class ImageUtils:
     if not os.path.exists(_temp_dir):
         os.makedirs(_temp_dir)
 
+    # 缺模板檔的警告每個檔案只印一次，避免戰鬥迴圈重複刷版面
+    _missing_template_warned: set = set()
+
+    @staticmethod
+    def _read_template(folder: str, filename: str):
+        """讀取模板圖；檔案不存在回傳 None（警告每檔僅一次，且不觸發 cv2 錯誤輸出）。"""
+        path = ImageUtils._template_path(folder, filename)
+        if not os.path.exists(path):
+            if filename not in ImageUtils._missing_template_warned:
+                ImageUtils._missing_template_warned.add(filename)
+                MessageLog.print_message(f"[WARNING] 模板圖檔 {filename} 不存在，跳過搜尋（每個檔案只提示一次）。")
+            return None
+        return cv2.imread(path, 0)
+
     @staticmethod
     def _template_path(folder: str, filename: str) -> str:
         """依遊戲語言解析模板路徑。
@@ -393,10 +407,8 @@ class ImageUtils:
         if Settings.debug_mode:
             MessageLog.print_message(f"\n[DEBUG] Starting process to find the {image_name.upper()} button image...")
 
-        template: numpy.ndarray = cv2.imread(ImageUtils._template_path("buttons", f"{image_name.lower()}.jpg"), 0)
+        template: numpy.ndarray = ImageUtils._read_template("buttons", f"{image_name.lower()}.jpg")
         if template is None:
-            if not suppress_error:
-                MessageLog.print_message(f"[WARNING] 模板圖檔 {image_name.lower()}.jpg 不存在，跳過搜尋。")
             return None
 
         new_tries = ImageUtils._determine_adjustment(image_name)
@@ -444,10 +456,8 @@ class ImageUtils:
         #     MessageLog.print_message("Find resume image")
             # 可能在resume game界面，需要重新进战斗
 
-        template: numpy.ndarray = cv2.imread(ImageUtils._template_path("headers", f"{image_name.lower()}_header.jpg"), 0)
+        template: numpy.ndarray = ImageUtils._read_template("headers", f"{image_name.lower()}_header.jpg")
         if template is None:
-            if not suppress_error:
-                MessageLog.print_message(f"[WARNING] 標頭模板 {image_name.lower()}_header.jpg 不存在，跳過確認。")
             return False
 
         new_tries = ImageUtils._determine_adjustment(image_name)
@@ -612,9 +622,8 @@ class ImageUtils:
         else:
             folder_name = "buttons"
 
-        template: numpy.ndarray = cv2.imread(ImageUtils._template_path(folder_name, f"{image_name}.jpg"), 0)
+        template: numpy.ndarray = ImageUtils._read_template(folder_name, f"{image_name}.jpg")
         if template is None:
-            MessageLog.print_message(f"[WARNING] 模板圖檔 {image_name}.jpg 不存在，回傳空清單。")
             return []
 
         locations = ImageUtils._match_all(template, custom_confidence)
@@ -782,10 +791,8 @@ class ImageUtils:
         """
         MessageLog.print_message(f"\n[INFO] Now waiting for {image_name} to vanish from screen...")
 
-        template: numpy.ndarray = cv2.imread(ImageUtils._template_path("buttons", f"{image_name.lower()}.jpg"), 0)
+        template: numpy.ndarray = ImageUtils._read_template("buttons", f"{image_name.lower()}.jpg")
         if template is None:
-            if suppress_error is False:
-                MessageLog.print_message(f"[WARNING] 模板圖檔 {image_name.lower()}.jpg 不存在。")
             return False
 
         for _ in range(timeout):

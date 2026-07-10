@@ -5,6 +5,7 @@
 - 休息任務用 QTimer 倒數，不阻塞介面
 - 後端輸出以 UTF-8 逐行讀取，透過 signal 丟給日誌視窗
 """
+import datetime
 import json
 import os
 import sys
@@ -14,6 +15,9 @@ from PySide6.QtCore import QObject, QProcess, QTimer, Signal
 from i18n import tr
 
 BREAK_MODE = "Take a break"
+
+# 執行日誌同步寫入 logs/ 目錄（每次執行一個檔案），方便事後直接讀檔查問題
+_LOGS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "logs")
 
 
 class TaskRunner(QObject):
@@ -36,6 +40,17 @@ class TaskRunner(QObject):
         self._process: QProcess | None = None
         self._break_timer: QTimer | None = None
         self._stopped = False
+        self._log_fh = None
+
+    def _log(self, line: str):
+        """送到 GUI 日誌視窗，同時寫入日誌檔。"""
+        self.log_line.emit(line)
+        if self._log_fh is not None:
+            try:
+                self._log_fh.write(line + "\n")
+                self._log_fh.flush()
+            except Exception:
+                pass
 
     def is_running(self) -> bool:
         return self._index >= 0
@@ -56,7 +71,15 @@ class TaskRunner(QObject):
         self._tasks = task_settings
         self._index = -1
         self._stopped = False
-        self.log_line.emit(tr("開始執行任務佇列，共 {n} 個任務", n = len(task_settings)))
+
+        os.makedirs(_LOGS_DIR, exist_ok = True)
+        log_path = os.path.join(_LOGS_DIR, datetime.datetime.now().strftime("run-%Y%m%d-%H%M%S.log"))
+        try:
+            self._log_fh = open(log_path, "w", encoding = "utf-8")
+        except OSError:
+            self._log_fh = None
+
+        self._log(tr("開始執行任務佇列，共 {n} 個任務", n = len(task_settings)))
         self._next()
 
     def stop(self):
@@ -82,7 +105,7 @@ class TaskRunner(QObject):
 
         if mode == BREAK_MODE:
             minutes = int(settings["game"]["itemAmount"])
-            self.log_line.emit(tr("休息 {m} 分鐘…", m = minutes))
+            self._log(tr("休息 {m} 分鐘…", m = minutes))
             self._break_timer = QTimer(self)
             self._break_timer.setSingleShot(True)
             self._break_timer.timeout.connect(self._on_break_done)
@@ -93,7 +116,7 @@ class TaskRunner(QObject):
         with open(settings_file, "w", encoding = "utf-8") as f:
             json.dump(settings, f, ensure_ascii = False, indent = 4)
 
-        self.log_line.emit(tr("第 {i} 個任務開始：{name}", i = self._index + 1, name = mode))
+        self._log(tr("第 {i} 個任務開始：{name}", i = self._index + 1, name = mode))
 
         self._process = QProcess(self)
         self._process.setWorkingDirectory(self.work_dir)
@@ -114,11 +137,11 @@ class TaskRunner(QObject):
         text = data.decode("utf-8", errors = "replace")
         for line in text.splitlines():
             if line.strip():
-                self.log_line.emit(line.rstrip())
+                self._log(line.rstrip())
 
     def _on_process_finished(self, exit_code: int, _status):
         self._process = None
-        self.log_line.emit(tr("第 {i} 個任務結束（代碼 {code}）", i = self._index + 1, code = exit_code))
+        self._log(tr("第 {i} 個任務結束（代碼 {code}）", i = self._index + 1, code = exit_code))
         self.task_finished.emit(self._index, exit_code)
         self._next()
 
@@ -126,4 +149,10 @@ class TaskRunner(QObject):
         self._index = -1
         self._tasks = []
         self._process = None
+        if self._log_fh is not None:
+            try:
+                self._log_fh.close()
+            except Exception:
+                pass
+            self._log_fh = None
         self.all_finished.emit()

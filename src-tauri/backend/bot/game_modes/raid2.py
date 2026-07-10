@@ -35,9 +35,19 @@ class Raid:
         if Game.check_for_pending():
             Game.go_back_home()
 
-        if Game.find_and_click_button("raid_backup_red", tries = 4, suppress_error = True) \
-                or Game.find_and_click_button("raid_backup", tries = 4, suppress_error = True):
+        # Backup 圖示會閃爍（紅/黃兩態＋發光動畫），信心值放寬並手動點擊
+        backup_location = None
+        for _ in range(4):
+            for variant in ("raid_backup_red", "raid_backup"):
+                backup_location = ImageUtils.find_button(variant, custom_confidence = 0.70, tries = 1, suppress_error = True)
+                if backup_location is not None:
+                    break
+            if backup_location is not None:
+                break
+
+        if backup_location is not None:
             MessageLog.print_message("[RAID] 從首頁 Backup 捷徑進入救援列表...")
+            MouseUtils.move_and_click_point(backup_location[0], backup_location[1], "raid_backup")
             Game.wait(2.0)
         else:
             MessageLog.print_message("[RAID] 首頁沒找到 Backup 捷徑，改走任務頁...")
@@ -219,7 +229,13 @@ class Raid:
 
         #Game.wait(3.0)
         # Now navigate to the Raid screen.
-        Raid.go_to_finder()
+        # 多人結算畫面有「Backup Requests」鈕可直接回救援列表，省去回首頁
+        if Game.find_and_click_button("raid_result_backup_requests", tries = 2, suppress_error = True):
+            MessageLog.print_message("[RAID] 從結算畫面直接回救援列表...")
+            Game.wait(2.0)
+            Raid._select_pinned_raid()
+        else:
+            Raid.go_to_finder()
         for i in range(10):
             success = Raid._join_raid()
             if success:

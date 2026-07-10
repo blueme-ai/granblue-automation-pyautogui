@@ -43,3 +43,4 @@ src-tauri/temp/
 src-tauri/mouse.log
 src-tauri/backend/log/
 results/
+logs/
