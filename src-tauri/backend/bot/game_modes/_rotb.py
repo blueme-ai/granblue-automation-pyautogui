@@ -183,19 +183,10 @@ class RiseOfTheBeasts:
                 difficulty = "Very Hard"
                 temp_mission_name = Settings.mission_name[3:]
             elif Settings.mission_name.find("EX") == 0:
+                # 直接由關卡名取得四象名（例如「EX Zhuque」→ Zhuque），
+                # 不再靠螢幕上的四象圖示辨識（舊作法圖示模板過時就會選錯）。
                 difficulty = "Extreme"
-                if ImageUtils.find_button("zhuque"):
-                    temp_mission_name = "Zhuque"
-                elif ImageUtils.find_button("baihu"):
-                    temp_mission_name = "Baihu"
-                elif ImageUtils.find_button("qinglong"):
-                    temp_mission_name = "Qinglong"
-                elif ImageUtils.find_button("sixiang_all"):
-                    temp_mission_name = "Qinglong"
-                elif ImageUtils.find_button("xuanwu"):
-                    temp_mission_name = "Xuanwu"
-                else:
-                    MessageLog.print_message("Failed to find any EX beasts.")
+                temp_mission_name = Settings.mission_name[3:]
 
             # Only Raids are marked with Extreme difficulty.
             if difficulty == "Extreme":
