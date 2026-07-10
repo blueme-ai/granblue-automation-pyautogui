@@ -64,6 +64,22 @@ class ImageUtils:
     _missing_template_warned: set = set()
 
     @staticmethod
+    def save_debug_screenshot(tag: str) -> None:
+        """存目前遊戲視窗截圖到 logs/，供事後診斷模板匹配失敗的原因。"""
+        try:
+            logs_dir = os.path.abspath(os.path.join(ImageUtils._current_dir, "..", "logs"))
+            os.makedirs(logs_dir, exist_ok = True)
+            if Settings.window_left is not None:
+                image = pyautogui.screenshot(region = (Settings.window_left, Settings.window_top, Settings.window_width, Settings.window_height))
+            else:
+                image = pyautogui.screenshot()
+            path = os.path.join(logs_dir, f"debug_{tag}_{datetime.datetime.now().strftime('%H%M%S')}.png")
+            image.save(path)
+            MessageLog.print_message(f"[DEBUG] 已存除錯截圖：{path}")
+        except Exception:
+            pass
+
+    @staticmethod
     def _read_template(folder: str, filename: str):
         """讀取模板圖；檔案不存在回傳 None（警告每檔僅一次，且不觸發 cv2 錯誤輸出）。"""
         path = ImageUtils._template_path(folder, filename)

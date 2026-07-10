@@ -51,6 +51,7 @@ class Raid:
             Game.wait(2.0)
         else:
             MessageLog.print_message("[RAID] 首頁沒找到 Backup 捷徑，改走任務頁...")
+            ImageUtils.save_debug_screenshot("backup_miss")
             Game.find_and_click_button("quest")
             Game.wait(2.0)
             Game.find_and_click_button("raid")
@@ -76,7 +77,10 @@ class Raid:
         n = Settings.mission_name[-1]
         pin_location = ImageUtils.find_button(f"raid_pin_{n}", custom_confidence = 0.70, tries = 3, suppress_error = True)
         if pin_location is not None:
-            MouseUtils.move_and_click_point(pin_location[0], pin_location[1], f"raid_pin_{n}")
+            # 1st~4th 文字本身不可點，要點角標下方的縮圖框才有判定；
+            # (26, 40) 是 1 倍縮放時角標中心到縮圖中心的偏移
+            _s = ImageUtils._template_scale
+            MouseUtils.move_and_click_point(pin_location[0] + int(26 * _s), pin_location[1] + int(40 * _s), f"raid_pin_{n}")
             Game.wait(1.5)
         else:
             MessageLog.print_message(f"[RAID] 找不到釘選位 {n} 的角標，沿用目前選中的釘選...")
@@ -232,7 +236,10 @@ class Raid:
         # 多人結算畫面有「Backup Requests」鈕可直接回救援列表，省去回首頁
         if Game.find_and_click_button("raid_result_backup_requests", tries = 2, suppress_error = True):
             MessageLog.print_message("[RAID] 從結算畫面直接回救援列表...")
+            # 救援列表載入較慢，等頁面出現指標再選釘選
             Game.wait(2.0)
+            if ImageUtils.find_button("reload_room", tries = 5, suppress_error = True) is None:
+                Game.wait(3.0)
             Raid._select_pinned_raid()
         else:
             Raid.go_to_finder()
