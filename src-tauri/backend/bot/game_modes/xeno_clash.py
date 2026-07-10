@@ -93,9 +93,9 @@ class XenoClash:
                         # Navigate to Vohu Manah Showdown.
                         MessageLog.print_message(f"[SPECIAL] Selecting 土六道 Extreme...")
                         MouseUtils.move_and_click_point(locations[2][0], locations[2][1], "play_round_button")
-                    elif formatted_mission_name == "风六道 Extreme":
+                    elif formatted_mission_name == "風六道 Extreme":
                         # Navigate to Sagittarius Showdown.
-                        MessageLog.print_message(f"[SPECIAL] Selecting 风六道 Extreme...")
+                        MessageLog.print_message(f"[SPECIAL] Selecting 風六道 Extreme...")
                         MouseUtils.move_and_click_point(locations[3][0], locations[3][1], "play_round_button")
                     elif formatted_mission_name == "光六道 Extreme":
                         # Navigate to Corow Showdown.

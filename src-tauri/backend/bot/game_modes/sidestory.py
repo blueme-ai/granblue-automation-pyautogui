@@ -33,11 +33,11 @@ class SideStory:
         """
         from bot.game import Game
         MessageLog.print_message(f"\n[GENERIC] GO to bookmark...")
-        # 按下 Alt 键
+        # 按下 Alt 鍵
         pyautogui.keyDown('alt')
-        # 按下 1 键
+        # 按下 1 鍵
         pyautogui.press('8')
-        # 抬起 Alt 键
+        # 抬起 Alt 鍵
         pyautogui.keyUp('alt')
 
         Game.wait(3.0)
@@ -63,7 +63,7 @@ class SideStory:
         Game.wait(3)
         Game.find_and_click_button("reload")
 
-        # 点击 最上任务相对位置
+        # 點擊 最上任務相對位置
         Game.wait(2)
         window_dimensions = ImageUtils.get_window_dimensions()
         count = 0
@@ -77,7 +77,7 @@ class SideStory:
                     return None
                 MouseUtils.move_and_click_point(window_dimensions[0]+186, window_dimensions[1]+512,"item1")
             if ImageUtils.find_button("attack", tries = 5):
-                # 如果选择队伍 ，则已完成剧情
+                # 如果選擇隊伍 ，則已完成劇情
                 if not ImageUtils.find_button("full_auto", tries = 5):
                     while not ImageUtils.find_button("set_full", tries = 5):
                         Game.find_and_click_button("menu")
@@ -102,7 +102,7 @@ class SideStory:
                 else:
                     Game.find_and_click_button("party_selection_ok")
                 if ImageUtils.find_button("auto_select", tries = 5):
-                    MessageLog.print_message(f"\n[GENERIC] 开始换人...")
+                    MessageLog.print_message(f"\n[GENERIC] 開始換人...")
                     Game.find_and_click_button("party", tries = 5)
                     Game.find_and_click_button("sub", tries = 5)
                     MouseUtils.move_and_click_point(window_dimensions[0]+315-77, window_dimensions[1]+512,"item1")
@@ -131,9 +131,9 @@ class SideStory:
                     if ImageUtils.find_button("attack"):
                         break
                 if ImageUtils.find_button("attack", tries = 10):
-                    #开始战斗
+                    #開始戰鬥
                     count += 1
-                    #设置fa
+                    #設置fa
                     if not ImageUtils.find_button("full_auto", tries = 5):
                         while not ImageUtils.find_button("set_full", tries = 5):
                             Game.find_and_click_button("menu")
@@ -168,7 +168,7 @@ class SideStory:
             if Game.find_and_click_button("goto_ss", tries = 5):
                 Game.wait(2)
                 if ImageUtils.find_button("skip", tries = 5):
-                    # 处理剧情
+                    # 處理劇情
                     SideStory.finish_story()
                 else:
                     # 直接打最上副本

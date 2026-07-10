@@ -131,7 +131,7 @@ class GuildWars:
 
                         if ImageUtils.wait_vanish("guild_wars_nightmare_150", timeout = 10):
                             #Game.find_and_click_button("guild_wars_nightmare_150")
-                            # 选择150 NM
+                            # 選擇150 NM
                             NM_locations = ImageUtils.find_all("guild_wars_nightmares")
                             MouseUtils.move_and_click_point(NM_locations[0][0], NM_locations[0][1], "guild_wars_nightmares")
                         Game.wait(3)
@@ -145,7 +145,7 @@ class GuildWars:
 
                         if ImageUtils.wait_vanish("guild_wars_nightmare_150", timeout = 10):
                             # Game.find_and_click_button("guild_wars_nightmare_150")
-                            # 选择200 NM
+                            # 選擇200 NM
                             NM_locations = ImageUtils.find_all("guild_wars_nightmares")
                             MouseUtils.move_and_click_point(NM_locations[1][0], NM_locations[1][1], "guild_wars_nightmares")
                         Game.wait(3)

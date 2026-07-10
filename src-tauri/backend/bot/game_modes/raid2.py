@@ -182,14 +182,14 @@ class Raid:
         hp_offset = int(Settings.hp_remain * ImageUtils._template_scale)
         offset_points = [(x + hp_offset, y) for (x, y) in hp_list]
 
-        # 步骤 2: 获取 RGB 颜色值
+        # 步驟 2: 獲取 RGB 顏色值
         def get_rgb_value(x, y):
-            # 在这里定义如何根据坐标返回 RGB 颜色值
+            # 在這裡定義如何根據座標返回 RGB 顏色值
             rgb_value = pyautogui.pixel(x, y)
             return rgb_value
 
         find = False
-        # 输出偏移后的坐标及其 RGB 颜色值
+        # 輸出偏移後的座標及其 RGB 顏色值
         for point in offset_points:
             rgb = get_rgb_value(point[0], point[1])
             MessageLog.print_message(f"Offset Point: {point}, RGB Color: {rgb}")
@@ -291,7 +291,7 @@ class Raid:
             return None
         # Select the Party.
         if Game.quick_start_mission():
-            MessageLog.print_message("\n[RAID] raid 次数+1")
+            MessageLog.print_message("\n[RAID] raid 次數+1")
             Settings.item_amount_farmed += 1
                     # Handle the rare case where joining the Raid after selecting the Summon and Party led the bot to the Quest Results screen with no loot to collect.
             if ImageUtils.confirm_location("no_loot", disable_adjustment = True):

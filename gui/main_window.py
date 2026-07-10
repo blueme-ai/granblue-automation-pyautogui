@@ -45,7 +45,7 @@ _SCRIPTS_DIR = os.path.join(_TAURI_DIR, "scripts")
 _DATA_DIR = os.path.join(_GUI_DIR, "data")
 
 # 這些模式的後端仍依賴 harjeb 的瀏覽器書籤快捷鍵，尚未改回原版導航
-BROKEN_MODES = {"快速活动", "Side Story"}
+BROKEN_MODES = {"快速活動", "Side Story"}
 
 
 def _load_json(name: str) -> dict:

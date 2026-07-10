@@ -111,7 +111,7 @@ class CombatMode:
             None
         """
         from bot.game import Game
-        # 如果技能无法使用，跳出OK btn
+        # 如果技能無法使用，跳出OK btn
         if ImageUtils.confirm_location("skill", tries = 2):
             Game.find_and_click_button("ok",tries=2)
 
@@ -362,9 +362,9 @@ class CombatMode:
             CombatMode._check_for_battle_end()
 
             if tries > 10:
-                # 检查是否不在战斗界面
+                # 檢查是否不在戰鬥界面
                 if ImageUtils.find_button("menu", tries = 5, suppress_error = True) is None:
-                    # 不在战斗界面
+                    # 不在戰鬥界面
                     MessageLog.print_message("[COMBAT] Not in combat.")
                     break
             #CombatMode._obfuscate_click()
@@ -378,7 +378,7 @@ class CombatMode:
     @staticmethod
     def _obfuscate_click():
         """
-        混淆点击,防止gbf anti-bot 检测
+        混淆點擊,防止gbf anti-bot 檢測
         """
         # safe_area
         top_left = (285,200)
@@ -420,7 +420,7 @@ class CombatMode:
 
             MessageLog.print_message(f"[COMBAT] Failed to find the \"Full Auto\" button. Falling back to Semi Auto.")
             MessageLog.print_message(f"[COMBAT] Double checking to see if Semi Auto is enabled.")
-            # 开启fa
+            # 開啟fa
             if not ImageUtils.find_button("full_auto", tries = 5) and not ImageUtils.find_button("full_auto_enabled"):
                 Game.find_and_click_button("menu")
                 if ImageUtils.find_button("close", tries = 5):
@@ -445,11 +445,11 @@ class CombatMode:
                 if ImageUtils.find_button("attack"):
                     break
             MessageLog.print_message(f"[COMBAT] Enabled Full Auto.")
-            # 可能不在战斗,尝试点击ok
+            # 可能不在戰鬥,嘗試點擊ok
             Game.find_and_click_button("ok")
             Game.find_and_click_button("party_selection_ok")
             
-            # 开启fa
+            # 開啟fa
             if ImageUtils.find_button("full_auto", tries = 5):
                 Game.find_and_click_button("full_auto")
             elif is_ss:
@@ -800,7 +800,7 @@ class CombatMode:
 
                 MouseUtils.move_and_click_point(x, y, "template_skill")
 
-                # 如果技能无法使用，跳出OK btn
+                # 如果技能無法使用，跳出OK btn
                 if ImageUtils.confirm_location("skill"):
                     Game.find_and_click_button("ok",tries=2)
 
@@ -1134,15 +1134,15 @@ class CombatMode:
             # Check for exit conditions.
             CombatMode._check_for_battle_end()
 
-            # 检查是否还在战斗界面
+            # 檢查是否還在戰鬥界面
             if ImageUtils.find_button("menu", tries = 5, suppress_error = True) is None:
-                # 不在战斗界面
+                # 不在戰鬥界面
                 MessageLog.print_message("[COMBAT] Not in combat 2.")
                 break
 
-            # 检查是否还在战斗界面
+            # 檢查是否還在戰鬥界面
             # if ImageUtils.find_button("ok", tries = 5, suppress_error = True) is None:
-            #     # 不在战斗界面
+            #     # 不在戰鬥界面
             #     MessageLog.print_message("[COMBAT] combat out of time.")
             #     Game.find_and_click_button("ok", tries = 1, suppress_error = True)
             #     break
@@ -1300,7 +1300,7 @@ class CombatMode:
             MessageLog.print_message("One punch !!!")
 
         if CombatMode._attack_button_location is None:
-            # Check for salute.  检查是否败北
+            # Check for salute.  檢查是否敗北
             if ImageUtils.confirm_location("salute_participants", tries = 3, suppress_error = True):
                 # Salute the participants.
                 MessageLog.print_message(f"[WARNING] Raid has unfortunately wiped during Combat Mode. Leaving the Raid room...")

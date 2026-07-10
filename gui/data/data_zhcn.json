@@ -1,5 +1,5 @@
 {
-  "转世沙盒": {
+  "轉世沙盒": {
     "Slithering Seductress": {
       "map": "Zone Eletio",
       "items": [
@@ -527,7 +527,7 @@
       ]
     }
   },
-  "转世": {
+  "轉世": {
     "Point Aquila": {
       "map": "Expedition",
       "items": [
@@ -547,7 +547,7 @@
       ]
     }
   },
-  "任务": {
+  "任務": {
     "Scattered Cargo": {
       "map": "Port Breeze Archipelago",
       "items": [
@@ -1127,7 +1127,7 @@
       ]
     }
   },
-  "共斗": {
+  "共鬥": {
     "H3-1 In a Dusk Dream": {
       "items": [
         "EXP"
@@ -1324,7 +1324,7 @@
       ]
     }
   },
-  "兑换活动": {
+  "兌換活動": {
     "EX Event Quest": {
       "map": "Event Quest",
       "items": [
@@ -1356,7 +1356,7 @@
       ]
     }
   },
-  "战货活动": {
+  "戰貨活動": {
     "EX Event Quest": {
       "map": "Event Quest",
       "items": [
@@ -1382,7 +1382,7 @@
       ]
     }
   },
-  "快速活动": {
+  "快速活動": {
     "Quest": {
       "map": "Event Quest",
       "items": [
@@ -1390,7 +1390,7 @@
       ]
     }
   },
-  "四象降临": {
+  "四象降臨": {
     "VH Zhuque": {
       "map": "Event Quest",
       "items": [
@@ -1446,7 +1446,7 @@
       ]
     }
   },
-  "古战场": {
+  "古戰場": {
     "Extreme": {
       "map": "Event Quest",
       "items": [
@@ -1490,7 +1490,7 @@
       ]
     }
   },
-  "公会战": {
+  "公會戰": {
     "1 Star": {
       "map": "Event Raid",
       "items": [
@@ -1522,7 +1522,7 @@
       ]
     }
   },
-  "勇气之地": {
+  "勇氣之地": {
     "Extreme": {
       "map": "Event Quest",
       "items": [
@@ -1555,7 +1555,7 @@
         "Repeated Runs"
       ]
     },
-    "风六道 Extreme": {
+    "風六道 Extreme": {
       "map": "Showdowns",
       "items": [
         "Repeated Runs"
@@ -1590,11 +1590,11 @@
       ]
     }
   },
-  "暂停休息": {
+  "暫停休息": {
     "Any": {
       "map": "None",
       "items": [
-        "分钟",
+        "分鐘",
         "Repeated Runs"
       ]
     }

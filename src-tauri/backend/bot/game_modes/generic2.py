@@ -34,11 +34,11 @@ class Generic:
     
         MessageLog.print_message(f"\n[GENERIC] GO to bookmark...")
         
-        # 按下 Alt 键
+        # 按下 Alt 鍵
         pyautogui.keyDown('alt')
-        # 按下 1 键
+        # 按下 1 鍵
         pyautogui.press('1')
-        # 抬起 Alt 键
+        # 抬起 Alt 鍵
         pyautogui.keyUp('alt')
 
 

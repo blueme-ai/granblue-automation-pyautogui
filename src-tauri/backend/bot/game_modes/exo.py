@@ -74,14 +74,14 @@ class Exo:
                         MouseUtils.move_and_click_point(round_play_button_locations2[1][0], round_play_button_locations2[1][1], "play_round_button")
                 except:
                     if len(round_play_button_locations) >= 1:
-                        # 没有找到多个开始按钮，应该是前面步骤没点好，打开默认第一个
+                        # 沒有找到多個開始按鈕，應該是前面步驟沒點好，打開默認第一個
                         MessageLog.print_message("Select first one instead of interrupt")
                         MouseUtils.move_and_click_point(round_play_button_locations[0][0], round_play_button_locations[0][1], "solo_battle")
                     else:
                         raise EventException("Failed to arrive at the Special Quest screen.")
 
             else:
-                # 可能在resume game界面，需要重新进战斗
+                # 可能在resume game界面，需要重新進戰鬥
                 if ImageUtils.confirm_location("resume_quests"):
                     MessageLog.print_message(f"RELOAD combat")
                 else:

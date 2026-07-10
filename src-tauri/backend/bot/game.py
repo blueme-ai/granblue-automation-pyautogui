@@ -829,7 +829,7 @@ class Game:
                 if True:
                     if ImageUtils.confirm_location("loot_collected", tries = 1):
                         return None
-                    # FA时刷新战斗
+                    # FA時刷新戰鬥
                     for i in range(1):
                         if ImageUtils.find_button("attack", tries = 3) is None:
                             if ImageUtils.confirm_location("exp_gained", tries=1):
@@ -1113,7 +1113,7 @@ class Game:
     @staticmethod
     def wait_end():
         while True:
-            # 判断不在战斗中则结束
+            # 判斷不在戰鬥中則結束
             if ImageUtils.find_all("exp_gained", tries = 1) is  not None:
                 return
 
@@ -1169,42 +1169,42 @@ class Game:
             Game.find_and_click_button("home")
             Game.wait(1.5)
 
-            # 检查是否需要大休息（每3-4小时一次）
-            work_period = random.randint(10800, 14400)  # 3-4小时的工作时间
-            random_time = random.randint(1980, 2100)  # 小休息间隔：33-35分钟
+            # 檢查是否需要大休息（每3-4小時一次）
+            work_period = random.randint(10800, 14400)  # 3-4小時的工作時間
+            random_time = random.randint(1980, 2100)  # 小休息間隔：33-35分鐘
             while Settings.item_amount_farmed < Settings.item_amount_to_farm:
                 try:
-                    if Settings.farming_mode == "Quest":  # 任务
+                    if Settings.farming_mode == "Quest":  # 任務
                         Quest.start(first_run)
                     elif Settings.farming_mode == "Fate":
                         Fate.start(first_run)
                     elif Settings.farming_mode == "Special":   # 特殊本（碎片）
                         Special.start(first_run)
-                    elif Settings.farming_mode == "Coop":     # 共斗
+                    elif Settings.farming_mode == "Coop":     # 共鬥
                         Coop.start(first_run)
                     elif Settings.farming_mode == "Raid":    # 舔/多人
                         Raid.start(first_run)
-                    elif Settings.farming_mode == "Event" or Settings.farming_mode == "Event (Token Drawboxes)":   # SS 活动
+                    elif Settings.farming_mode == "Event" or Settings.farming_mode == "Event (Token Drawboxes)":   # SS 活動
                         Event.start(first_run)
                     elif Settings.farming_mode == "Event Quick":
                         Event_quick.start()
                     elif Settings.farming_mode == "Rise of the Beasts":      # 四象
                         RiseOfTheBeasts.start(first_run)
-                    elif Settings.farming_mode == "Guild Wars":          # 古战场
+                    elif Settings.farming_mode == "Guild Wars":          # 古戰場
                         GuildWars.start(first_run)
-                    elif Settings.farming_mode == "Dread Barrage":       # 公会战
+                    elif Settings.farming_mode == "Dread Barrage":       # 公會戰
                         DreadBarrage.start(first_run)
                     elif Settings.farming_mode == "Side Story":       # 支線（僅支援書籤快捷鍵環境）
                         SideStory.start()
-                    elif Settings.farming_mode == "Proving Grounds":     #连战
+                    elif Settings.farming_mode == "Proving Grounds":     #連戰
                         ProvingGrounds.start(first_run)
                     elif Settings.farming_mode == "Xeno Clash":          # 六道
                         XenoClash.start(first_run)
                     elif Settings.farming_mode == "Exo":          # 六道
                         Exo.start(first_run)    
-                    elif Settings.farming_mode == "Arcarum":              # 转世
+                    elif Settings.farming_mode == "Arcarum":              # 轉世
                         Arcarum.start()
-                    elif Settings.farming_mode == "Arcarum Sandbox":      # 转世沙盒
+                    elif Settings.farming_mode == "Arcarum Sandbox":      # 轉世沙盒
                         ArcarumSandbox.start()
                     elif Settings.farming_mode == "Generic":
                         Generic.start()
@@ -1214,25 +1214,25 @@ class Game:
                     Game.find_and_click_button("home")
                     Game.wait(1.5)
 
-                # 初始化变量用于存储前一个值和不变次数
+                # 初始化變量用於存儲前一個值和不變次數
                 previous_item_amount_farmed = Settings.item_amount_farmed
                 unchanged_count = 0
 
-                # 在这个代码块之前的地方
+                # 在這個代碼塊之前的地方
                 if Settings.item_amount_farmed == previous_item_amount_farmed:
                     unchanged_count += 1
                 else:
-                    unchanged_count = 0  # 如果值有所变化，重置计数器
+                    unchanged_count = 0  # 如果值有所變化，重置計數器
 
-                # 检查计数器是否达到了3次
+                # 檢查計數器是否達到了3次
                 if unchanged_count >= 3:
                     Game.find_and_click_button("home")
-                    unchanged_count = 0  # 可选：重置计数器
+                    unchanged_count = 0  # 可選：重置計數器
 
-                # 更新前一个值
+                # 更新前一個值
                 previous_item_amount_farmed = Settings.item_amount_farmed
 
-                MessageLog.print_message("[Info] 目标 %d次" % Settings.item_amount_to_farm)
+                MessageLog.print_message("[Info] 目標 %d次" % Settings.item_amount_to_farm)
                 MessageLog.print_message("[Info] 已完成 %d" % Settings.item_amount_farmed)
                 
                 if Settings.item_amount_farmed < Settings.item_amount_to_farm:
@@ -1240,10 +1240,10 @@ class Game:
                     Game._delay_between_runs()
                     Game._move_mouse_security_check()
                     
-                    # 获取当前时间
+                    # 獲取當前時間
                     now_time = time.time()
 
-                    # 初始化运行时间和休息时间的追踪
+                    # 初始化運行時間和休息時間的追蹤
                     if not hasattr(Settings, 'total_run_time'):
                         Settings.total_run_time = 0
                     if not hasattr(Settings, 'total_rest_time'):
@@ -1252,7 +1252,7 @@ class Game:
                         Settings.last_status_time = init_time
                         Settings.is_resting = False
 
-                    # 更新运行/休息时间统计
+                    # 更新運行/休息時間統計
                     time_elapsed = now_time - Settings.last_status_time
                     if Settings.is_resting:
                         Settings.total_rest_time += time_elapsed
@@ -1260,11 +1260,11 @@ class Game:
                         Settings.total_run_time += time_elapsed
                     Settings.last_status_time = now_time
 
-                    # 如果是首次运行，先运行2分钟然后休息
+                    # 如果是首次運行，先運行2分鐘然後休息
 
                     if Settings.enable_opt_in_api:
-                            initial_rest = random.randint(900, 1020)  # 首次休息：15-17分钟
-                            MessageLog.print_message("[Sleep] 首次运行结束，开始休息 %d 秒" % initial_rest)
+                            initial_rest = random.randint(900, 1020)  # 首次休息：15-17分鐘
+                            MessageLog.print_message("[Sleep] 首次運行結束，開始休息 %d 秒" % initial_rest)
                             Settings.is_resting = True
                             time.sleep(initial_rest)
                             Settings.is_resting = False
@@ -1276,48 +1276,48 @@ class Game:
                             
                     first_run = False
 
-                    # 检查是否需要休息
+                    # 檢查是否需要休息
                     if (now_time - start_time) > random_time:
-                        # 检查是否到了大休息时间（距离上次大休息超过3-4小时）
+                        # 檢查是否到了大休息時間（距離上次大休息超過3-4小時）
                         if (now_time - start_time_big) > work_period:
-                            # 大休息：1-2小时
+                            # 大休息：1-2小時
                             long_rest = random.randint(3600, 7200)
-                            MessageLog.print_message("[Sleep] 开始大休息 %d 秒 (%.1f 分钟)" % (long_rest, long_rest/60))
+                            MessageLog.print_message("[Sleep] 開始大休息 %d 秒 (%.1f 分鐘)" % (long_rest, long_rest/60))
                             Settings.is_resting = True
                             time.sleep(long_rest)
                             Settings.is_resting = False
-                            MessageLog.print_message("[Sleep] 大休息结束")
+                            MessageLog.print_message("[Sleep] 大休息結束")
                             start_time = time.time()
-                            start_time_big = time.time()  # 重置大休息计时器
-                            work_period = random.randint(10800, 14400)  # 下次大休息间隔：3-4小时
+                            start_time_big = time.time()  # 重置大休息計時器
+                            work_period = random.randint(10800, 14400)  # 下次大休息間隔：3-4小時
                             Game.find_and_click_button("home")
                             Game.wait(1.5)
                         else:
-                            # 小休息：15-17分钟
+                            # 小休息：15-17分鐘
                             sleep_time = random.randint(900, 1020)
-                            MessageLog.print_message("[Sleep] 开始小休息 %d 秒 (%.1f 分钟)" % (sleep_time, sleep_time/60))
+                            MessageLog.print_message("[Sleep] 開始小休息 %d 秒 (%.1f 分鐘)" % (sleep_time, sleep_time/60))
                             Settings.is_resting = True
                             time.sleep(sleep_time)
                             Settings.is_resting = False
-                            MessageLog.print_message("[Sleep] 小休息结束")
+                            MessageLog.print_message("[Sleep] 小休息結束")
                             start_time = time.time()
                             Game.find_and_click_button("home")
                             Game.wait(1.5)
                     
-                    # 检查总运行时间是否超过40000秒（约11.1小时）
+                    # 檢查總運行時間是否超過40000秒（約11.1小時）
                     if (now_time - init_time) > 40000:
-                        MessageLog.print_message("[Info] 已运行超过40000秒，结束任务！")
-                        MessageLog.print_message("[Info] 总运行时间: %.2f 小时" % (Settings.total_run_time / 3600))
+                        MessageLog.print_message("[Info] 已運行超過40000秒，結束任務！")
+                        MessageLog.print_message("[Info] 總運行時間: %.2f 小時" % (Settings.total_run_time / 3600))
                         return True
                     
-                    # 显示运行信息
-                    MessageLog.print_message("[Info] 已执行 %d 分钟" % ((now_time - start_time)//60))
-                    MessageLog.print_message("[Info] 离下次小休息还有 %d 分钟" % ((random_time - now_time + start_time)//60))
-                    MessageLog.print_message("[Info] 离下次大休息还有 %d 分钟" % ((work_period - now_time + start_time_big)//60))
-                    MessageLog.print_message("[Info] 总计已运行 %.2f 小时" % (Settings.total_run_time / 3600))
-                    MessageLog.print_message("[Info] 总计已休息 %.2f 小时" % (Settings.total_rest_time / 3600))
+                    # 顯示運行信息
+                    MessageLog.print_message("[Info] 已執行 %d 分鐘" % ((now_time - start_time)//60))
+                    MessageLog.print_message("[Info] 離下次小休息還有 %d 分鐘" % ((random_time - now_time + start_time)//60))
+                    MessageLog.print_message("[Info] 離下次大休息還有 %d 分鐘" % ((work_period - now_time + start_time_big)//60))
+                    MessageLog.print_message("[Info] 總計已運行 %.2f 小時" % (Settings.total_run_time / 3600))
+                    MessageLog.print_message("[Info] 總計已休息 %.2f 小時" % (Settings.total_rest_time / 3600))
 
-                    random_time = random.randint(1980, 2100)  # 小休息间隔：33-35分钟
+                    random_time = random.randint(1980, 2100)  # 小休息間隔：33-35分鐘
 
 
         except Exception as e:
