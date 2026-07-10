@@ -65,11 +65,14 @@ class MouseUtils:
         pyautogui.click()
 
     @staticmethod
-    def move(x,y):
-        MouseUtils.hc.move((x,y),2)
-        #bezierTrajectory.move(x, y)
-        #mouse.move(x, y, multiplier=round(random.uniform(3.5, 5.5), 3))
-        # 鼠标当前的位置
+    def move(x, y):
+        """移動滑鼠。速度由 GUI 的「滑鼠移動速度」設定控制（預設 0.2 秒）；
+        勾選「模擬人類滑鼠移動」時用貝茲曲線軌跡，否則直線快速移動。"""
+        duration = max(float(Settings.custom_mouse_speed), 0.05)
+        if Settings.enable_bezier_curve_mouse_movement:
+            MouseUtils.hc.move((x, y), max(duration, 0.3))
+        else:
+            pyautogui.moveTo(x, y, duration = duration)
 
 
     @staticmethod

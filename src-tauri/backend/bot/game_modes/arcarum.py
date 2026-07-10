@@ -30,18 +30,10 @@ class Arcarum:
 
         if Arcarum._first_run:
             MessageLog.print_message(f"\n[ARCARUM] Now beginning navigation to {Arcarum._expedition}.")
-            Game.go_back_home()
 
-            # Navigate to the Arcarum banner.
-            tries = 30
-            while tries > 0:
-                if Game.find_and_click_button("arcarum_banner", tries = 1) is False:
-                    MouseUtils.scroll_screen_from_home_button(-200)
-                    tries -= 1
-                    if tries <= 0:
-                        raise ArcarumException("Failed to navigate to Arcarum from the Home screen.")
-                else:
-                    break
+            # 轉世入口已搬到首頁的 Extras 展開選單（舊版的 arcarum_banner 已不存在）。
+            if Game.navigate_to_arcarum_extras() is False:
+                raise ArcarumException("Failed to navigate to Arcarum from the Home screen.")
 
             Arcarum._first_run = False
         else:

@@ -8,12 +8,13 @@ from PySide6.QtGui import QColor
 
 # 全域停止快捷鍵（機器人會搶滑鼠，需要不用滑鼠就能停的方式）。
 # keyboard 套件在 Windows 免額外權限；mac 需輔助使用權限，失敗時靜默略過。
+# 用 ESC（Ctrl+Alt+Q 與用戶其他軟體衝突）；只在任務執行中才有作用。
 try:
     import keyboard as _keyboard
 except ImportError:
     _keyboard = None
 
-STOP_HOTKEY = "ctrl+alt+q"
+STOP_HOTKEY = "esc"
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QCheckBox,

@@ -320,6 +320,44 @@ class Game:
         return False
 
     @staticmethod
+    def navigate_to_arcarum_extras() -> bool:
+        """從首頁經 Extras 展開選單進入轉世（傳統轉世與沙盒共用入口）。
+
+        新版遊戲把轉世入口搬到首頁下方的 Extras 區塊：捲動到 Extras 列 →
+        點擊展開 → 點「Arcarum THE WORLD BEYOND」磚。點 Extras 列會在
+        展開／收合間切換，所以找不到磚時再點一次列重試。
+
+        Returns:
+            (bool): True 表示成功點進轉世入口。
+        """
+        Game.go_back_home(confirm_location_check = True)
+
+        tries = 10
+        while tries > 0:
+            extras_location = ImageUtils.find_button("extras", tries = 1, suppress_error = True)
+            if extras_location is None:
+                MouseUtils.scroll_screen_from_home_button(-400)
+                Game.wait(0.5)
+                tries -= 1
+                continue
+
+            # Extras 已展開的話磚會直接可見。
+            if Game.find_and_click_button("extras_arcarum", tries = 1, suppress_error = True):
+                Game.wait(3.0)
+                return True
+
+            # 點 Extras 列展開（若原本已展開會被收合，下一輪迴圈會再展開）。
+            MouseUtils.move_and_click_point(extras_location[0], extras_location[1], "extras")
+            Game.wait(1.5)
+            if Game.find_and_click_button("extras_arcarum", tries = 2, suppress_error = True):
+                Game.wait(3.0)
+                return True
+
+            tries -= 1
+
+        return False
+
+    @staticmethod
     def check_for_captcha():
         """偵測 CAPTCHA。偵測到時播放音效通知使用者手動輸入，等待驗證碼畫面消失後自動繼續。
 
