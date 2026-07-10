@@ -332,28 +332,38 @@ class Game:
         """
         Game.go_back_home(confirm_location_check = True)
 
-        tries = 10
-        while tries > 0:
-            extras_location = ImageUtils.find_button("extras", tries = 1, suppress_error = True)
-            if extras_location is None:
+        for attempt in range(2):
+            # 往下捲到 Extras 列。
+            extras_location = None
+            tries = 8
+            while tries > 0:
+                extras_location = ImageUtils.find_button("extras", tries = 1, suppress_error = True)
+                if extras_location is not None:
+                    break
                 MouseUtils.scroll_screen_from_home_button(-400)
                 Game.wait(0.5)
                 tries -= 1
-                continue
 
-            # Extras 已展開的話磚會直接可見。
+            if extras_location is None:
+                return False
+
+            # 磚已直接可見代表 Extras 原本就是展開的。
             if Game.find_and_click_button("extras_arcarum", tries = 1, suppress_error = True):
                 Game.wait(3.0)
                 return True
 
-            # 點 Extras 列展開（若原本已展開會被收合，下一輪迴圈會再展開）。
+            # 點 Extras 列展開，展開後磚在畫面下方，要邊往下捲邊找。
             MouseUtils.move_and_click_point(extras_location[0], extras_location[1], "extras")
             Game.wait(1.5)
-            if Game.find_and_click_button("extras_arcarum", tries = 2, suppress_error = True):
-                Game.wait(3.0)
-                return True
+            for _ in range(4):
+                if Game.find_and_click_button("extras_arcarum", tries = 1, suppress_error = True):
+                    Game.wait(3.0)
+                    return True
+                MouseUtils.scroll_screen_from_home_button(-300)
+                Game.wait(0.5)
 
-            tries -= 1
+            # 還是沒找到：可能剛才那一下把原本展開的選單收合了，回頂部重來一次。
+            Game.go_back_home()
 
         return False
 

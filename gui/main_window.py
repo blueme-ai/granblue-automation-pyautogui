@@ -62,6 +62,8 @@ class MainWindow(QWidget):
 
         self.gamemode_dict = _load_json("data_zhcn.json")
         self.translate_dict = _load_json("translate.json")
+        # 英文關卡名 → 日文名（顯示用，內部值仍是英文）
+        self.names_ja = _load_json("names_ja.json")
 
         # 任務佇列：[{"mode": 中文模式名, "script": 檔名, "count": int}]，休息任務 script 為 None
         self.tasks: list[dict] = []
@@ -364,13 +366,23 @@ class MainWindow(QWidget):
 
     # ---------- 任務管理 ----------
 
+    def _mission_display(self, mission: str) -> str:
+        """關卡顯示名：有日文名時顯示「英文｜日文」，難度前綴自動剝除後查詢。"""
+        ja = self.names_ja.get(mission)
+        if ja is None:
+            for prefix in ("N ", "H ", "VH ", "EX+ ", "EX "):
+                if mission.startswith(prefix):
+                    ja = self.names_ja.get(mission[len(prefix):])
+                    break
+        return f"{mission}｜{ja}" if ja else mission
+
     def _on_mode_changed(self):
         """依所選模式重新填入關卡清單。"""
         self.mission_combo.blockSignals(True)
         self.mission_combo.clear()
         mode = self.mode_combo.currentData()
         for mission_name in self.gamemode_dict.get(mode, {}).keys():
-            self.mission_combo.addItem(mission_name, mission_name)
+            self.mission_combo.addItem(self._mission_display(mission_name), mission_name)
         self.mission_combo.blockSignals(False)
         self._on_mission_changed()
 

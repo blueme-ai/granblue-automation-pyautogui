@@ -83,12 +83,22 @@ class TaskRunner(QObject):
         self._next()
 
     def stop(self):
-        """停止目前任務並清空佇列。"""
+        """停止目前任務並清空佇列。
+
+        backend/main.py 會再用 multiprocessing 生出真正控制滑鼠的子行程，
+        只殺 QProcess 本體會留下孤兒繼續動滑鼠——必須整棵行程樹一起殺。
+        """
         self._stopped = True
         if self._break_timer is not None:
             self._break_timer.stop()
             self._break_timer = None
         if self._process is not None:
+            pid = int(self._process.processId())
+            if sys.platform == "win32" and pid:
+                import subprocess
+                subprocess.run(
+                    ["taskkill", "/PID", str(pid), "/T", "/F"],
+                    creationflags = subprocess.CREATE_NO_WINDOW, check = False)
             self._process.kill()
         else:
             self._finish_all()
