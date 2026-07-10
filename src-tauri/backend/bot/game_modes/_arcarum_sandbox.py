@@ -518,29 +518,29 @@ class ArcarumSandbox:
                 raise ArcarumSandboxException("Failed to navigate back to Replicard Sandbox.")
 
         Game.wait(3.0)
-        # Move to the Zone that the user's mission is at.
-        if Settings.map_name == "Zone Eletio":
-            navigation_check = Game.find_and_click_button("arcarum_sandbox_zone_eletio")
-        elif Settings.map_name == "Zone Faym":
-            navigation_check = Game.find_and_click_button("arcarum_sandbox_zone_faym")
-        elif Settings.map_name == "Zone Goliath":
-            navigation_check = Game.find_and_click_button("arcarum_sandbox_zone_goliath")
-        elif Settings.map_name == "Zone Harbinger":
-            navigation_check = Game.find_and_click_button("arcarum_sandbox_zone_harbinger")
-        elif Settings.map_name == "Zone Invidia":
-            MouseUtils.scroll_screen_from_home_button(-400)
-            navigation_check = Game.find_and_click_button("arcarum_sandbox_zone_invidia")
-        elif Settings.map_name == "Zone Joculator":
-            MouseUtils.scroll_screen_from_home_button(-400)
-            navigation_check = Game.find_and_click_button("arcarum_sandbox_zone_joculator")
-        elif Settings.map_name == "Zone Kalendae":
-            MouseUtils.scroll_screen_from_home_button(-400)
-            navigation_check = Game.find_and_click_button("arcarum_sandbox_zone_kalendae")
-        elif Settings.map_name == "Zone Liber":
-            MouseUtils.scroll_screen_from_home_button(-400)
-            navigation_check = Game.find_and_click_button("arcarum_sandbox_zone_liber")
-        else:
+
+        zone_buttons = {
+            "Zone Eletio": "arcarum_sandbox_zone_eletio",
+            "Zone Faym": "arcarum_sandbox_zone_faym",
+            "Zone Goliath": "arcarum_sandbox_zone_goliath",
+            "Zone Harbinger": "arcarum_sandbox_zone_harbinger",
+            "Zone Invidia": "arcarum_sandbox_zone_invidia",
+            "Zone Joculator": "arcarum_sandbox_zone_joculator",
+            "Zone Kalendae": "arcarum_sandbox_zone_kalendae",
+            "Zone Liber": "arcarum_sandbox_zone_liber",
+        }
+        if Settings.map_name not in zone_buttons:
             raise ArcarumSandboxException("Invalid map name provided for Arcarum Replicard Sandbox navigation.")
+
+        # 先直接找圖磚點擊（大螢幕上八個區域一次全顯示，不需捲動）；
+        # 找不到才往下捲一點再找——舊版對下半部區域無條件先捲 -400，
+        # 在高解析度視窗上會把圖磚捲出點擊位置導致點空（下半部區域全失敗）。
+        button_name = zone_buttons[Settings.map_name]
+        navigation_check = Game.find_and_click_button(button_name, tries = 3, suppress_error = True)
+        if navigation_check is False:
+            MouseUtils.scroll_screen_from_home_button(-400)
+            Game.wait(1.0)
+            navigation_check = Game.find_and_click_button(button_name, tries = 3, suppress_error = True)
 
         if navigation_check is False:
             raise ArcarumSandboxException("Failed to navigate into the Sandbox Zone.")
