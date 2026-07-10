@@ -427,7 +427,9 @@ class ArcarumSandbox:
             # Now click on the specified node that has the mission offset by the coordinates associated with it based off of the Home Menu button location.
             # 節點偏移座標是 1 倍縮放時量的，要乘上偵測到的螢幕縮放比例
             scale = ImageUtils._template_scale
-            home_location: Tuple[int, int] = ImageUtils.find_button("home_menu")
+            home_location: Tuple[int, int] = ImageUtils.find_button("home_menu", tries = 10)
+            if home_location is None:
+                raise ArcarumSandboxException("Failed to find the Home Menu anchor for node navigation (zone map may not have loaded).")
             MouseUtils.move_and_click_point(home_location[0] - int(x * scale), home_location[1] + int(y * scale), "arcarum_node")
 
         Game.wait(1.0)
@@ -508,9 +510,12 @@ class ArcarumSandbox:
         else:
             Game.wait(4.0)
 
-        # If the bot is not at Replicard Sandbox and instead is at regular Arcarum, navigate to Replicard Sandbox by clicking on its banner.
+        # 不在沙盒大廳的話（例如剛被錯誤處理送回首頁），重新走首頁 Extras 導航。
+        # 舊版是點 arcarum_sandbox_banner，該模板已過時（實測 0.31）會亂點，不可用。
         if ImageUtils.confirm_location("arcarum_sandbox") is False:
-            Game.find_and_click_button("arcarum_sandbox_banner")
+            MessageLog.print_message("[ARCARUM.SANDBOX] 不在沙盒大廳，重新從首頁 Extras 導航...")
+            if Game.navigate_to_arcarum_extras() is False:
+                raise ArcarumSandboxException("Failed to navigate back to Replicard Sandbox.")
 
         Game.wait(3.0)
         # Move to the Zone that the user's mission is at.
@@ -540,7 +545,11 @@ class ArcarumSandbox:
         if navigation_check is False:
             raise ArcarumSandboxException("Failed to navigate into the Sandbox Zone.")
 
+        # 等待區域地圖載入完成（以 home_menu 錨點出現為準），
+        # 否則後續的節點座標計算會拿不到錨點而失敗。
         Game.wait(2.0)
+        if ImageUtils.find_button("home_menu", tries = 10, suppress_error = True) is None:
+            raise ArcarumSandboxException("Zone map did not finish loading.")
 
         # Now that the Zone is on screen, have the bot move all the way to the left side of the map.
         ArcarumSandbox._reset_position()

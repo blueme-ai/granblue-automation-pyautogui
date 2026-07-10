@@ -1,6 +1,5 @@
 {
   "_comment": "英文關卡名 → 日文名（GameWith 對照）。顯示用；難度前綴 N/H/VH/EX 會自動剝除後查詢",
-
   "Slithering Seductress": "這い寄る蠱惑の蛇姫",
   "Living Lightning Rod": "稲妻呼びの怪魚",
   "Eletion Drake": "エローシアンドレイク",
@@ -11,7 +10,6 @@
   "Terror Trifecta": "トリニティフィアー",
   "Rageborn One": "憤怒より生まれし者",
   "Eletion Glider": "エローシアン・グライガー",
-
   "Trident Grandmaster": "気高き三又鉾の達人",
   "Hoarfrost Icequeen": "霧氷纏いし凝結の主",
   "Oceanic Archon": "溟渤の支配者",
@@ -22,7 +20,6 @@
   "Eyes of Sorrow": "悲哀塗れの瞳",
   "Mad Shearwielder": "狂気の剪刀を振るう者",
   "Faymian Gun": "フェイミアン・ガンナー",
-
   "Avatar of Avarice": "強欲の権化たる器",
   "Temptation's Guide": "幻惑へ誘いし者",
   "World's Veil": "世界を覆い隠す者",
@@ -33,7 +30,6 @@
   "Vestige of Truth": "真理の残骸",
   "Writhing Despair": "絡みつく絶望の主",
   "Goliath Triune": "ゴライアス・トライン",
-
   "Vengeful Demigod": "復仇の亜神",
   "Dirgesinger": "挽歌を紡ぎし者",
   "Wildwind Conjurer/Fullthunder Conjurer": "狂飆を齎す者/万雷を齎す者",
@@ -44,7 +40,6 @@
   "Phantasmagoric Aberration": "変幻自在たる異形",
   "Dimensional Riftwalker": "次元の狭間より出でし者",
   "Harbinger Stormer": "ハービング・ストーム",
-
   "Infernal Hellbeast": "炎柱の魔獣",
   "Spikeball": "有刺殻の球獣",
   "Blushing Groom": "千里を駆ける駿馬",
@@ -52,7 +47,6 @@
   "Deva of Wisdom": "繁栄と虚栄の神象",
   "Sword of Aberration": "浮遊する異形の剣魔",
   "Athena Militis": "アテナ・ミーレス",
-
   "Glacial Hellbeast": "氷塊の魔獣",
   "Giant Sea Plant": "ジャイアント・シープラント",
   "Maiden of the Depths": "水底へと誘う乙女",
@@ -60,7 +54,6 @@
   "Nebulous One": "空から降る百の怪魔",
   "Dreadful Scourge": "悪を得た怪奇の剛腕",
   "Grani Militis": "グラニ・ミーレス",
-
   "Bedeviled Plague": "降り注ぐ悪辣の病魔",
   "Xeno Vohu Manah Militis": "ゼノウォフマナフ・ミーレス",
   "Tainted Hellmaiden": "不浄の魔獣",
@@ -69,7 +62,6 @@
   "Ebony Executioner": "黒鎧の断罪刀",
   "Hellbeast of Doom": "死誘の魔獣",
   "Baal Militis": "バアル・ミーレス",
-
   "Mounted Toxophilite": "天穿つ人馬",
   "Beetle of Damnation": "致命と崩落の剛槍",
   "Ageless Guardian Beast": "悠久を守護せし炎帝",
@@ -77,7 +69,6 @@
   "Drifting Blade Demon": "浮遊する光剣の悪魔",
   "Simpering Beast": "うすら笑み遮る魔獣",
   "Garuda Militis": "ガルーダ・ミーレス",
-
   "Fire Trial": "火の試練",
   "Water Trial": "水の試練",
   "Earth Trial": "土の試練",
@@ -92,14 +83,13 @@
   "Sagittarius Showdown": "サジタリウス討滅戦",
   "Corow Showdown": "コロゥ討滅戦",
   "Diablo Showdown": "ディアボロ討滅戦",
-
   "Zhuque": "朱雀",
   "Xuanwu": "玄武",
   "Baihu": "白虎",
   "Qinglong": "青龍",
   "Lvl 100 Shenxian": "神仙",
-
   "Point Aquila": "アクィラ",
   "Point Bellator": "ベラトール",
-  "Point Celsus": "ケルスス"
+  "Point Celsus": "ケルスス",
+  "Lvl 150 Shenxian": "神仙 Lvl 150"
 }

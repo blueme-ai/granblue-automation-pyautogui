@@ -87,19 +87,15 @@ class RiseOfTheBeasts:
         # Go to the Home screen.
         Game.go_back_home(confirm_location_check = True)
         MessageLog.print_message(f"\n[ROTB] Now navigating to trade...")
-        # Go to the Event by clicking on the "Menu" button and then click the very first banner.
-        Game.find_and_click_button("home_menu")
-        Game.wait(1.0)
-        banner_locations = ImageUtils.find_all("event_banner", custom_confidence = 0.7)
-        if len(banner_locations) == 0:
-            banner_locations = ImageUtils.find_all("event_banner_blue", custom_confidence = 0.7)
-            if len(banner_locations) == 0:
-                MessageLog.print_message("Failed to find the Event banner.")
-
-        if Settings.first_event:
-            MouseUtils.move_and_click_point(banner_locations[0][0], banner_locations[0][1], "event_banner")
-        else:
-            MouseUtils.move_and_click_point(banner_locations[1][0], banner_locations[1][1], "event_banner")
+        # 直接在首頁點「RISE OF THE BEASTS」活動橫幅（不再靠橫幅順序猜，
+        # 多個活動同開時舊作法會點錯）。找不到就往下捲。
+        banner_tries = 8
+        while Game.find_and_click_button("rotb_event_banner", tries = 1, suppress_error = True) is False:
+            MouseUtils.scroll_screen_from_home_button(-300)
+            Game.wait(0.5)
+            banner_tries -= 1
+            if banner_tries <= 0:
+                raise RiseOfTheBeastsException("Failed to find the Rise of the Beasts event banner on the Home screen.")
         Game.wait(3.0)
 
         # Check for resume.
@@ -154,19 +150,15 @@ class RiseOfTheBeasts:
 
         MessageLog.print_message(f"\n[ROTB] Now navigating to Rise of the Beasts...")
 
-        # Go to the Event by clicking on the "Menu" button and then click the very first banner.
-        Game.find_and_click_button("home_menu")
-        Game.wait(1.0)
-        banner_locations = ImageUtils.find_all("event_banner", custom_confidence = 0.7)
-        if len(banner_locations) == 0:
-            banner_locations = ImageUtils.find_all("event_banner_blue", custom_confidence = 0.7)
-            if len(banner_locations) == 0:
-                MessageLog.print_message("Failed to find the Event banner.")
-
-        if Settings.first_event:
-            MouseUtils.move_and_click_point(banner_locations[0][0], banner_locations[0][1], "event_banner")
-        else:
-            MouseUtils.move_and_click_point(banner_locations[1][0], banner_locations[1][1], "event_banner")
+        # 直接在首頁點「RISE OF THE BEASTS」活動橫幅（不再靠橫幅順序猜，
+        # 多個活動同開時舊作法會點錯）。找不到就往下捲。
+        banner_tries = 8
+        while Game.find_and_click_button("rotb_event_banner", tries = 1, suppress_error = True) is False:
+            MouseUtils.scroll_screen_from_home_button(-300)
+            Game.wait(0.5)
+            banner_tries -= 1
+            if banner_tries <= 0:
+                raise RiseOfTheBeastsException("Failed to find the Rise of the Beasts event banner on the Home screen.")
         Game.wait(3.0)
 
         # Check for resume.
@@ -181,9 +173,11 @@ class RiseOfTheBeasts:
             # Scroll the screen down to make way for smaller screens.
             MouseUtils.scroll_screen_from_home_button(-400)
             # Remove the difficulty prefix from the mission name.
+            # 難度只看關卡名（舊版只要畫面上出現 EX+ 橫幅就整個當成 EX+，
+            # 活動期間 EX+ 橫幅常駐會導致所有關卡都選錯）。
             difficulty = ""
             temp_mission_name = ""
-            if ImageUtils.find_button("extreme_p"):
+            if Settings.mission_name.find("EX+") == 0:
                 difficulty = "Extreme+"
             elif Settings.mission_name.find("VH ") == 0:
                 difficulty = "Very Hard"
@@ -225,12 +219,21 @@ class RiseOfTheBeasts:
                 else:
                     MessageLog.print_message("Failed to open the ROTB Battle the Beasts popup.")
 
-            elif Settings.mission_name == "Lvl 100 Shenxian":
+            elif "Shenxian" in Settings.mission_name:
                 # Click on Shenxian to host.
                 MessageLog.print_message(f"[ROTB] Now hosting Shenxian Raid...")
                 Game.find_and_click_button("rotb_shenxian_host")
+                Game.wait(2.0)
 
-                if ImageUtils.wait_vanish("rotb_shenxian_host", timeout = 10) is False:
+                # 新版會跳出「Challenge Shenxian」難度選擇框：兩張 V2 IMPOSSIBLE 卡
+                # （左 Lvl 100／AP-40，右 Lvl 150／AP-80），卡上角標找出位置後
+                # 依關卡名點左或右（點角標下方 40px 落在卡片本體上）。
+                card_locations = ImageUtils.find_all("rotb_shenxian_card")
+                if len(card_locations) >= 2:
+                    index = 1 if "150" in Settings.mission_name else 0
+                    _s = ImageUtils._template_scale
+                    MouseUtils.move_and_click_point(card_locations[index][0], card_locations[index][1] + int(40 * _s), "rotb_shenxian_card")
+                elif ImageUtils.wait_vanish("rotb_shenxian_host", timeout = 5) is False:
                     MessageLog.print_message(f"[ROTB] There are no more Shenxian hosts left. Alerting user...")
                     raise RiseOfTheBeastsException("There are no more Shenxian hosts left.")
 
@@ -289,7 +292,7 @@ class RiseOfTheBeasts:
         from bot.game import Game
         is_loot = 1
         if not first_run:
-            if Settings.mission_name != "Lvl 100 Shenxian":
+            if "Shenxian" not in Settings.mission_name:
                 is_loot = Settings.item_amount_farmed % 40
             else:
                 is_loot = Settings.item_amount_farmed % 7
@@ -318,7 +321,7 @@ class RiseOfTheBeasts:
 
         # Check if the bot is at the Summon Selection screen.
         if ImageUtils.confirm_location("select_a_summon", tries = 30):
-            if Settings.mission_name != "Lvl 100 Shenxian":
+            if "Shenxian" not in Settings.mission_name:
                 summon_check = Game.select_default_summon()
                 if summon_check:
                     # Find and click the "OK" button to start the mission.
