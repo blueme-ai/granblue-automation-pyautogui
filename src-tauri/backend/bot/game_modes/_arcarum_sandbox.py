@@ -528,6 +528,7 @@ class ArcarumSandbox:
             "Zone Joculator": "arcarum_sandbox_zone_joculator",
             "Zone Kalendae": "arcarum_sandbox_zone_kalendae",
             "Zone Liber": "arcarum_sandbox_zone_liber",
+            "Zone Mundus": "arcarum_sandbox_zone_mundus",
         }
         if Settings.map_name not in zone_buttons:
             raise ArcarumSandboxException("Invalid map name provided for Arcarum Replicard Sandbox navigation.")
@@ -550,6 +551,20 @@ class ArcarumSandbox:
         Game.wait(2.0)
         if ImageUtils.find_button("home_menu", tries = 10, suppress_error = True) is None:
             raise ArcarumSandboxException("Zone map did not finish loading.")
+
+        # Zone Mundus 是輻射狀地圖，結構與其他 8 區不同（元素選擇器＋中央
+        # The World＋六個元素王節點）。底部有常駐的「The World」選項列，
+        # 目前支援打中央 The World（主要素材本）：直接點該列右側的「>」箭頭
+        # 開始，不需要左右節點導航。元素王（12 隻）需另外的元素選擇流程，尚未支援。
+        if Settings.map_name == "Zone Mundus":
+            world_location = ImageUtils.find_button("arcarum_sandbox_the_world", tries = 5)
+            if world_location is None:
+                raise ArcarumSandboxException("Failed to find The World mission row in Zone Mundus.")
+            # 從「The World」文字中心往右到「>」箭頭的偏移（1 倍縮放量測，乘縮放比例）
+            _s = ImageUtils._template_scale
+            MouseUtils.move_and_click_point(world_location[0] + int(235 * _s), world_location[1] + int(15 * _s), "arcarum_sandbox_the_world")
+            Game.wait(3.0)
+            return None
 
         # Now that the Zone is on screen, have the bot move all the way to the left side of the map.
         ArcarumSandbox._reset_position()
