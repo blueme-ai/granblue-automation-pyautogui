@@ -20,22 +20,32 @@ class Raid:
 
     @staticmethod
     def go_to_finder():
-        """圖像導航到救援列表頁（首頁 → 任務 → Raid），取代舊版的 Alt+2 書籤快捷鍵。"""
+        """圖像導航到救援列表頁，取代舊版的 Alt+2 書籤快捷鍵。
+
+        首頁右側 Quest 鈕上方有「Backup」捷徑可直達救援列表（圖示大多是紅色、
+        偶爾黃色，兩種模板都試）；捷徑找不到才走 任務頁 → Raid 鈕 的長路徑。
+        """
         from bot.game import Game
 
         Game.go_back_home(confirm_location_check = True)
-        Game.find_and_click_button("quest")
-        Game.wait(2.0)
 
         # 檢查「你已從 Raid 撤退」彈窗與待處理戰鬥。
         if ImageUtils.confirm_location("you_retreated_from_the_raid_battle", tries = 2):
             Game.find_and_click_button("ok")
         if Game.check_for_pending():
+            Game.go_back_home()
+
+        if Game.find_and_click_button("raid_backup_red", tries = 2, suppress_error = True) \
+                or Game.find_and_click_button("raid_backup", tries = 2, suppress_error = True):
+            MessageLog.print_message("[RAID] 從首頁 Backup 捷徑進入救援列表...")
+            Game.wait(2.0)
+        else:
+            MessageLog.print_message("[RAID] 首頁沒找到 Backup 捷徑，改走任務頁...")
             Game.find_and_click_button("quest")
             Game.wait(2.0)
+            Game.find_and_click_button("raid")
+            Game.wait(2.0)
 
-        Game.find_and_click_button("raid")
-        Game.wait(2.0)
         Raid._select_pinned_raid()
 
     @staticmethod
@@ -117,7 +127,13 @@ class Raid:
 
         recovery_time = 1.5
 
-        #Game.wait(2.0)
+        # 頁面防呆：確認真的在救援列表頁（右上有 Raid List 圓鈕或列表重整鈕），
+        # 否則 pending_battle_sidebar 會在首頁等別的畫面誤匹配、亂點一通。
+        if ImageUtils.find_button("raid_list_button", tries = 2, suppress_error = True) is None \
+                and ImageUtils.find_button("reload_room", tries = 2, suppress_error = True) is None:
+            MessageLog.print_message("[RAID] 不在救援列表頁（導航可能失敗），本輪不點擊。")
+            return False
+
         if not ImageUtils.find_button("pending_battle_sidebar", tries = 5):
             return False
 
@@ -209,13 +225,12 @@ class Raid:
             success = Raid._join_raid()
             if success:
                 break
-            # 頁內重整救援列表；沒有按鈕就 F5 重載頁面後重新選分頁
+            # 頁內重整救援列表；找不到重整鈕代表不在列表頁，重新導航一次
             if Game.find_and_click_button("reload_room", tries = 2, suppress_error = True):
                 Game.wait(2)
             else:
-                pyautogui.press('f5')
-                Game.wait(3)
-                Raid._select_pinned_raid()
+                MessageLog.print_message("[RAID] 找不到列表重整鈕，重新導航到救援列表...")
+                Raid.go_to_finder()
 
 
     @staticmethod
