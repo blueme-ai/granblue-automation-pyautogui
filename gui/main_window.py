@@ -75,6 +75,7 @@ class MainWindow(QWidget):
 
         self._build_ui()
         self._retranslate()
+        self._load_options()
         self.resize(980, 620)
 
         # 快捷鍵回呼在背景執行緒觸發，經 Signal 轉回 Qt 主執行緒處理
@@ -491,6 +492,53 @@ class MainWindow(QWidget):
             "game_language": self.game_lang_combo.currentData(),
         }
 
+    _OPTIONS_FILE = os.path.join(_DATA_DIR, "app_options.json")
+
+    def _apply_options(self, opt: dict):
+        """把存檔的設定套回各元件（collect_options 的反向）。"""
+        self.bezier_check.setChecked(opt.get("bezier_mouse", False))
+        self.mouse_speed_spin.setValue(opt.get("mouse_speed", 0.1))
+        self.delay_check.setChecked(opt.get("delay_enabled", False))
+        self.delay_spin.setValue(opt.get("delay_seconds", 15))
+        self.random_delay_check.setChecked(opt.get("random_delay_enabled", False))
+        self.delay_lower_spin.setValue(opt.get("delay_lower", 15))
+        self.delay_upper_spin.setValue(opt.get("delay_upper", 60))
+        self.refresh_check.setChecked(opt.get("refresh_during_combat", True))
+        self.quick_summon_check.setChecked(opt.get("auto_quick_summon", False))
+        self.bypass_summon_check.setChecked(opt.get("bypass_reset_summon", False))
+        self.static_window_check.setChecked(opt.get("static_window", True))
+        self.anti_detect_check.setChecked(opt.get("anti_detection", False))
+        self.rest_check.setChecked(opt.get("rest_at_start", False))
+        self.auto_exit_check.setChecked(opt.get("auto_exit_raid", False))
+        self.auto_exit_spin.setValue(opt.get("auto_exit_minutes", 10))
+        self.no_timeout_check.setChecked(opt.get("no_timeout", False))
+        self.hp_spin.setValue(opt.get("hp_remain", 1))
+        i = self.game_lang_combo.findData(opt.get("game_language", "en"))
+        if i >= 0:
+            self.game_lang_combo.setCurrentIndex(i)
+
+    def _save_options(self):
+        """把目前設定寫檔，下次開啟自動載入。"""
+        try:
+            with open(self._OPTIONS_FILE, "w", encoding = "utf-8") as f:
+                json.dump(self.collect_options(), f, ensure_ascii = False, indent = 2)
+        except OSError:
+            pass
+
+    def _load_options(self):
+        """開啟時載入上次存的設定（沒有檔案就用預設值）。"""
+        if not os.path.exists(self._OPTIONS_FILE):
+            return
+        try:
+            with open(self._OPTIONS_FILE, encoding = "utf-8") as f:
+                self._apply_options(json.load(f))
+        except (OSError, ValueError):
+            pass
+
+    def closeEvent(self, event):
+        self._save_options()
+        super().closeEvent(event)
+
     def _toggle_run(self):
         if self.runner.is_running():
             answer = QMessageBox.question(
@@ -505,6 +553,7 @@ class MainWindow(QWidget):
             return
 
         options = self.collect_options()
+        self._save_options()
         settings_list = []
         for task in self.tasks:
             if task["mode"] == BREAK_MODE:
