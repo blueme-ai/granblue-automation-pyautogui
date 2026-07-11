@@ -831,7 +831,13 @@ class ImageUtils:
         Returns:
             (Tuple[int, int]): Tuple of the width and the height of the image.
         """
-        image = Image.open(ImageUtils._template_path("buttons", f"{image_name}.jpg"))
+        # 有些點擊目標是算出來的座標、沒有對應模板檔（例如 Mundus 節點、
+        # The World 中央球）。找不到檔案時回傳一個小預設框，讓點擊隨機化
+        # 照常運作、不因缺檔崩潰。
+        path = ImageUtils._template_path("buttons", f"{image_name}.jpg")
+        if not os.path.exists(path):
+            return 20, 20
+        image = Image.open(path)
         width, height = image.size
         image.close()
         return width, height
