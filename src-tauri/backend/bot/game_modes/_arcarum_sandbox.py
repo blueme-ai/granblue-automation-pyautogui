@@ -626,20 +626,29 @@ class ArcarumSandbox:
 
         for _page in range(9):
             bubbles = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.70)
+            # 依上→下、左→右排序，逐個嘗試點選（點到才打，點不到換下一個）。
+            bubbles.sort(key = lambda p: (p[1], p[0]))
             if len(bubbles) > 0:
-                # 依上→下、左→右排序，打第一個（起始位置已由 start_pan 輪替、
-                # 加上今日打完的節點會消失，整體會逐步輪過所有節點）。
-                bubbles.sort(key = lambda p: (p[1], p[0]))
-                idx = 0
-                bx, by = bubbles[idx]
-                MessageLog.print_message(f"[ARCARUM.SANDBOX] 本頁發現 {len(bubbles)} 個可挑戰節點（起始翻頁 {start_pan}），挑戰第 {idx + 1} 個...")
-                # 劍氣泡浮在節點的「右上方」，節點龍本體在氣泡的左下方
-                # （實測偏移約 -40, +30，乘縮放比例）。點節點才會讓底部關卡列
-                # 切換成該節點的怪（否則底部沿用上次打的，會誤打 The World）。
-                MouseUtils.move_and_click_point(bx - int(40 * _s), by + int(30 * _s), "arcarum_mundus_node")
-                Game.wait(2.0)
-                ImageUtils.save_debug_screenshot("mundus_after_node_click")
+                MessageLog.print_message(f"[ARCARUM.SANDBOX] 本頁發現 {len(bubbles)} 個可挑戰節點（起始翻頁 {start_pan}）...")
 
+            for (bx, by) in bubbles:
+                # 劍氣泡浮在節點上方，節點龍本體在氣泡下方偏側。不同位置的節點
+                # 氣泡相對方向略有差異，逐一嘗試幾個候選點，直到底部切換成
+                # 該節點的怪為止。中央 The World 會被排除——底部若仍是 The World
+                # 代表點空了（沿用上次選的），絕不在此模式開打 The World。
+                selected = False
+                for (dx, dy) in ((-40, 30), (0, 38), (-30, 45), (0, 0)):
+                    MouseUtils.move_and_click_point(bx + int(dx * _s), by + int(dy * _s), "arcarum_mundus_node")
+                    Game.wait(1.5)
+                    if ImageUtils.find_button("arcarum_sandbox_the_world", tries = 1, suppress_error = True) is None:
+                        selected = True
+                        break
+
+                if not selected:
+                    # 這顆氣泡幾個候選點都沒選中（底部仍 The World）→ 換下一顆。
+                    continue
+
+                ImageUtils.save_debug_screenshot("mundus_after_node_click")
                 # 底部關卡列：找所有「>」箭頭，點最上面那個（第一個關卡）。
                 arrows = ImageUtils.find_all("arcarum_sandbox_mission_go", custom_confidence = 0.72)
                 if len(arrows) > 0:
@@ -648,11 +657,9 @@ class ArcarumSandbox:
                     MouseUtils.move_and_click_point(ax, ay, "arcarum_mission_go")
                     Game.wait(2.0)
                     return None
+                MessageLog.print_message("[ARCARUM.SANDBOX] 選了節點但底部找不到關卡箭頭，換下一個節點...")
 
-                MessageLog.print_message("[ARCARUM.SANDBOX] 選了節點但底部找不到關卡箭頭，存除錯圖後往右翻頁...")
-                ImageUtils.save_debug_screenshot("mundus_no_arrow")
-
-            # 本頁沒有可打的節點（或選了沒出關卡）→ 往右翻頁再找。
+            # 本頁沒能選中任何節點 → 往右翻頁再找。
             if Game.find_and_click_button("arcarum_sandbox_right_arrow", tries = 1, suppress_error = True):
                 Game.wait(1.0)
             else:
