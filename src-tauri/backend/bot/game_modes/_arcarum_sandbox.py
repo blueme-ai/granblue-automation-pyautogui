@@ -607,9 +607,19 @@ class ArcarumSandbox:
         MessageLog.print_message("\n[ARCARUM.SANDBOX] Mundus 元素掃描：尋找可挑戰的節點...")
         _s = ImageUtils._template_scale
 
-        # 先把地圖翻到最左邊，讓掃描順序固定。
+        # 先把地圖翻到最左邊，讓翻頁位置有固定起點。
         for _ in range(8):
             if Game.find_and_click_button("arcarum_sandbox_left_arrow", tries = 1, suppress_error = True):
+                Game.wait(0.8)
+            else:
+                break
+
+        # 地圖會左右翻頁，一個視角只露出部分節點。用已完成次數決定本輪的
+        # 起始翻頁位置，讓每輪從地圖不同段開始掃，逐步覆蓋到全部 12 個節點
+        # （否則永遠只打最左頁那幾個）。
+        start_pan = Settings.item_amount_farmed % 6
+        for _ in range(start_pan):
+            if Game.find_and_click_button("arcarum_sandbox_right_arrow", tries = 1, suppress_error = True):
                 Game.wait(0.8)
             else:
                 break
@@ -617,11 +627,12 @@ class ArcarumSandbox:
         for _page in range(9):
             bubbles = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.70)
             if len(bubbles) > 0:
-                # 依上→下、左→右排序，並用已完成次數輪替目標，避免一直打同一個節點。
+                # 依上→下、左→右排序，打第一個（起始位置已由 start_pan 輪替、
+                # 加上今日打完的節點會消失，整體會逐步輪過所有節點）。
                 bubbles.sort(key = lambda p: (p[1], p[0]))
-                idx = Settings.item_amount_farmed % len(bubbles)
+                idx = 0
                 bx, by = bubbles[idx]
-                MessageLog.print_message(f"[ARCARUM.SANDBOX] 本頁發現 {len(bubbles)} 個可挑戰節點，挑戰第 {idx + 1} 個...")
+                MessageLog.print_message(f"[ARCARUM.SANDBOX] 本頁發現 {len(bubbles)} 個可挑戰節點（起始翻頁 {start_pan}），挑戰第 {idx + 1} 個...")
                 # 劍氣泡浮在節點的「右上方」，節點龍本體在氣泡的左下方
                 # （實測偏移約 -40, +30，乘縮放比例）。點節點才會讓底部關卡列
                 # 切換成該節點的怪（否則底部沿用上次打的，會誤打 The World）。
