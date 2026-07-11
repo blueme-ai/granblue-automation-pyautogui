@@ -613,15 +613,24 @@ class ArcarumSandbox:
             Game.find_and_click_button("cancel", tries = 1, suppress_error = True)
 
         def _try_select_and_fight(bx, by) -> bool:
-            # 點某顆氣泡對應的節點，成功「選中元素怪並開打」回傳 True。
-            # 判定成功＝底部出現關卡「>」箭頭 且 不是中央 The World（避免誤打世界）。
+            # 點某顆氣泡對應的節點，成功「選中並開打有每日次數的關卡」回傳 True。
+            # 判定選中＝底部出現關卡「>」箭頭 且 不是中央 The World（避免誤打世界）。
             for (dx, dy) in ((-40, 30), (0, 38), (-45, 20), (30, 35)):
                 MouseUtils.move_and_click_point(bx + int(dx * _s), by + int(dy * _s), "arcarum_mundus_node")
                 Game.wait(2.0)
                 is_world = ImageUtils.find_button("arcarum_sandbox_the_world", tries = 1, suppress_error = True) is not None
                 arrows = ImageUtils.find_all("arcarum_sandbox_mission_go", custom_confidence = 0.72)
                 if len(arrows) > 0 and not is_world:
+                    # 選中某節點了。只打「有每日次數（Attempts Left）」的關卡——
+                    # 也就是 Herald 增益王與每日 Militis（門票/素材來源）；若此節點
+                    # 的每日關卡已打完、只剩無限 Defender（如 Tide Caller），就跳過
+                    # 不打，免得白耗 AAP。
+                    if ImageUtils.find_button("arcarum_sandbox_attempts_left", tries = 1, suppress_error = True) is None:
+                        MessageLog.print_message("[ARCARUM.SANDBOX] 此節點每日關卡已打完（只剩無限 Defender），跳過。")
+                        return False
                     ImageUtils.save_debug_screenshot("mundus_after_node_click")
+                    # 每日關卡在最上（Herald→每日 Militis），無限 Defender 在下，
+                    # 點最上面的箭頭即打到有次數的關卡。
                     arrows.sort(key = lambda p: p[1])
                     MouseUtils.move_and_click_point(arrows[0][0], arrows[0][1], "arcarum_mission_go")
                     Game.wait(2.0)
