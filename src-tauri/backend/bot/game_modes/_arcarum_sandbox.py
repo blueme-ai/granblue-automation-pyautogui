@@ -578,8 +578,12 @@ class ArcarumSandbox:
                 MouseUtils.move_and_click_point(world_location[0] + int(235 * _s), world_location[1] + int(15 * _s), "arcarum_sandbox_the_world")
                 Game.wait(3.0)
                 return None
-            else:
+            elif Settings.mission_name == "Mundus Element Sweep":
                 ArcarumSandbox._navigate_mundus_element()
+                return None
+            else:
+                # 指定單刷某一隻元素王（關卡名即該怪名，例如 "Herald of Water"）。
+                ArcarumSandbox._navigate_mundus_target(Settings.mission_name)
                 return None
 
         # Now that the Zone is on screen, have the bot move all the way to the left side of the map.
@@ -591,53 +595,33 @@ class ArcarumSandbox:
         return None
 
     @staticmethod
-    def _navigate_mundus_element():
-        """Zone Mundus 元素節點掃描：找一個「可挑戰」的節點，開它底部的
-        第一個關卡（通常是 Herald 增益王），用來刷 The World 的門票。
+    def _mundus_scan(handle_selected) -> bool:
+        """通用的 Zone Mundus 節點掃描。
 
-        機制：可挑戰的節點上有「劍氣泡」標記（arcarum_sandbox_node_battle）。
-        先把地圖翻到最左，逐頁掃描；找到氣泡就點它下方的節點選中它，
-        底部關卡列出現後，找所有「>」箭頭（arcarum_sandbox_mission_go）
-        點最上面那個開打。今日打完的節點會沒有氣泡，自然換下一個。
-
-        座標偏移（氣泡→節點）為初版估值，需依實機 log/除錯截圖校準。
+        可挑戰的節點上有「劍氣泡」標記（arcarum_sandbox_node_battle）。先翻到
+        最左、依 start_pan 起始位置（用已完成次數輪替以覆蓋全地圖），逐視角、
+        逐節點嘗試選中（多候選偏移；成功＝底部出現關卡「>」箭頭 且 不是中央
+        The World，避免誤打世界）。選中後把該節點的箭頭清單交給 handle_selected
+        處理，回傳 True 代表已處理完成（結束掃描）。整圈都沒處理成功回傳 False。
         """
         from bot.game import Game
-
-        MessageLog.print_message("\n[ARCARUM.SANDBOX] Mundus 元素掃描：尋找可挑戰的節點...")
         _s = ImageUtils._template_scale
 
         def _clear_popups():
-            # 清掉可能殘留的任務資訊彈窗（Details/Close 那種），否則會擋住點擊。
             Game.find_and_click_button("close", tries = 1, suppress_error = True)
             Game.find_and_click_button("cancel", tries = 1, suppress_error = True)
 
-        def _try_select_and_fight(bx, by) -> bool:
-            # 點某顆氣泡對應的節點，成功「選中並開打有每日次數的關卡」回傳 True。
-            # 判定選中＝底部出現關卡「>」箭頭 且 不是中央 The World（避免誤打世界）。
+        def _select_node(bx, by):
+            # 回傳選中節點後底部的關卡箭頭清單；沒選中回傳 None。
             for (dx, dy) in ((-40, 30), (0, 38), (-45, 20), (30, 35)):
                 MouseUtils.move_and_click_point(bx + int(dx * _s), by + int(dy * _s), "arcarum_mundus_node")
                 Game.wait(2.0)
                 is_world = ImageUtils.find_button("arcarum_sandbox_the_world", tries = 1, suppress_error = True) is not None
                 arrows = ImageUtils.find_all("arcarum_sandbox_mission_go", custom_confidence = 0.72)
                 if len(arrows) > 0 and not is_world:
-                    # 選中某節點了。只打「有每日次數（Attempts Left）」的關卡——
-                    # 也就是 Herald 增益王與每日 Militis（門票/素材來源）；若此節點
-                    # 的每日關卡已打完、只剩無限 Defender（如 Tide Caller），就跳過
-                    # 不打，免得白耗 AAP。
-                    if ImageUtils.find_button("arcarum_sandbox_attempts_left", tries = 1, suppress_error = True) is None:
-                        MessageLog.print_message("[ARCARUM.SANDBOX] 此節點每日關卡已打完（只剩無限 Defender），跳過。")
-                        return False
-                    ImageUtils.save_debug_screenshot("mundus_after_node_click")
-                    # 每日關卡在最上（Herald→每日 Militis），無限 Defender 在下，
-                    # 點最上面的箭頭即打到有次數的關卡。
-                    arrows.sort(key = lambda p: p[1])
-                    MouseUtils.move_and_click_point(arrows[0][0], arrows[0][1], "arcarum_mission_go")
-                    Game.wait(2.0)
-                    return True
-            return False
+                    return arrows
+            return None
 
-        # 先把地圖翻到最左邊，讓翻頁位置有固定起點。
         _clear_popups()
         for _ in range(8):
             if Game.find_and_click_button("arcarum_sandbox_left_arrow", tries = 1, suppress_error = True):
@@ -645,7 +629,6 @@ class ArcarumSandbox:
             else:
                 break
 
-        # 用已完成次數決定起始翻頁位置，讓每輪從地圖不同段開始，逐步覆蓋全部節點。
         start_pan = Settings.item_amount_farmed % 6
         for _ in range(start_pan):
             if Game.find_and_click_button("arcarum_sandbox_right_arrow", tries = 1, suppress_error = True):
@@ -653,8 +636,6 @@ class ArcarumSandbox:
             else:
                 break
 
-        # 逐視角掃描：本視角的節點若都選不中（例如置中視角 The World 卡中間、
-        # 或有彈窗），就往右翻到下一個視角再試；一整圈都不行才放棄。
         for _view in range(10):
             _clear_popups()
             bubbles = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.70)
@@ -662,9 +643,10 @@ class ArcarumSandbox:
             if len(bubbles) > 0:
                 MessageLog.print_message(f"[ARCARUM.SANDBOX] 本視角發現 {len(bubbles)} 個可挑戰節點（起始翻頁 {start_pan}）...")
             for (bx, by) in bubbles:
-                if _try_select_and_fight(bx, by):
-                    return None
-            # 本視角沒能選中任何節點 → 往右翻頁換視角。到最右就回最左繞一圈。
+                arrows = _select_node(bx, by)
+                if arrows is not None and handle_selected(arrows):
+                    return True
+            # 本視角處理不成 → 往右翻頁換視角；到最右繞回最左。
             if Game.find_and_click_button("arcarum_sandbox_right_arrow", tries = 1, suppress_error = True):
                 Game.wait(1.0)
             else:
@@ -673,9 +655,55 @@ class ArcarumSandbox:
                         Game.wait(0.7)
                     else:
                         break
+        return False
 
-        ImageUtils.save_debug_screenshot("mundus_no_node")
-        raise ArcarumSandboxException("Mundus: 找不到可挑戰的元素節點（可能今日已全部打完）。")
+    @staticmethod
+    def _navigate_mundus_element():
+        """Zone Mundus 元素王掃描：只打「有每日次數（Attempts Left）」的關卡
+        （Herald 增益王＋每日 Militis，門票/素材來源），跳過只剩無限 Defender
+        的節點，用來刷 The World 的門票。"""
+        from bot.game import Game
+
+        MessageLog.print_message("\n[ARCARUM.SANDBOX] Mundus 元素掃描：尋找有每日次數的節點...")
+
+        def handle(arrows):
+            if ImageUtils.find_button("arcarum_sandbox_attempts_left", tries = 1, suppress_error = True) is None:
+                MessageLog.print_message("[ARCARUM.SANDBOX] 此節點每日關卡已打完（只剩無限 Defender），跳過。")
+                return False
+            ImageUtils.save_debug_screenshot("mundus_after_node_click")
+            # 每日關卡在最上（Herald→每日 Militis），無限 Defender 在下。
+            arrows.sort(key = lambda p: p[1])
+            MouseUtils.move_and_click_point(arrows[0][0], arrows[0][1], "arcarum_mission_go")
+            Game.wait(2.0)
+            return True
+
+        if not ArcarumSandbox._mundus_scan(handle):
+            ImageUtils.save_debug_screenshot("mundus_no_node")
+            raise ArcarumSandboxException("Mundus: 找不到有每日次數的元素節點（可能今日已全部打完）。")
+
+    @staticmethod
+    def _navigate_mundus_target(target_name: str):
+        """Zone Mundus 指定單刷某一隻怪：掃遍地圖，找到底部關卡列出現該怪
+        名字（模板 arcarum_mundus_<名字>）的節點就打那一關。名字模板需事先
+        從遊戲截圖裁好（檔名：小寫、空格與 ' - 轉底線）。"""
+        from bot.game import Game
+
+        tmpl = "arcarum_mundus_" + target_name.lower().replace(" ", "_").replace("'", "").replace("-", "_")
+        MessageLog.print_message(f"\n[ARCARUM.SANDBOX] Mundus 指定單刷「{target_name}」...")
+
+        def handle(arrows):
+            name_loc = ImageUtils.find_button(tmpl, tries = 1, suppress_error = True)
+            if name_loc is None:
+                return False  # 這個節點的關卡列沒有目標怪 → 換下一個。
+            ImageUtils.save_debug_screenshot("mundus_target_found")
+            # 點與目標名字同一列（y 最接近）的那個箭頭。
+            arrows.sort(key = lambda p: abs(p[1] - name_loc[1]))
+            MouseUtils.move_and_click_point(arrows[0][0], arrows[0][1], "arcarum_mission_go")
+            Game.wait(2.0)
+            return True
+
+        if not ArcarumSandbox._mundus_scan(handle):
+            raise ArcarumSandboxException(f"Mundus: 掃遍地圖找不到「{target_name}」（今日已打完、名稱模板缺失、或名稱不符）。")
 
     @staticmethod
     def _refill_aap():
