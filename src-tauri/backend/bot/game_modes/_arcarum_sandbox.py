@@ -553,29 +553,34 @@ class ArcarumSandbox:
             raise ArcarumSandboxException("Zone map did not finish loading.")
 
         # Zone Mundus 是輻射狀地圖，結構與其他 8 區不同（元素選擇器＋中央
-        # The World＋六個元素王節點）。底部有常駐的「The World」選項列，
-        # 目前支援打中央 The World（主要素材本）：直接點該列右側的「>」箭頭
-        # 開始，不需要左右節點導航。元素王（12 隻）需另外的元素選擇流程，尚未支援。
+        # The World＋六個元素王節點）。兩種目標：
+        #  - The World（中央）：底部常駐選項列，直接點「>」開打。
+        #  - 元素王掃描（Mundus Element Sweep）：掃描地圖上可挑戰的節點，
+        #    打第一個的第一關（Herald 增益王），用來刷 The World 的門票。
         if Settings.map_name == "Zone Mundus":
             _s = ImageUtils._template_scale
-            # 進場預設選中中央 The World，底部列會顯示它；直接找該列。
-            world_location = ImageUtils.find_button("arcarum_sandbox_the_world", tries = 3, suppress_error = True)
-            if world_location is None:
-                # 底部沒顯示 The World（遊戲可能記住了上次選的其他節點）→
-                # 點地圖中央的 The World 球選中它再試。中央球相對 home_menu 的
-                # 偏移是 1 倍縮放量測 (-204, +207)，乘縮放比例。
-                MessageLog.print_message("[ARCARUM.SANDBOX] 底部未顯示 The World，點中央球重新選中...")
-                home_location = ImageUtils.find_button("home_menu", tries = 5)
-                if home_location is not None:
-                    MouseUtils.move_and_click_point(home_location[0] - int(204 * _s), home_location[1] + int(207 * _s), "arcarum_the_world_orb")
-                    Game.wait(2.0)
-                world_location = ImageUtils.find_button("arcarum_sandbox_the_world", tries = 5)
-            if world_location is None:
-                raise ArcarumSandboxException("Failed to find The World mission row in Zone Mundus.")
-            # 從「The World」文字中心往右到「>」箭頭的偏移（1 倍縮放量測，乘縮放比例）
-            MouseUtils.move_and_click_point(world_location[0] + int(235 * _s), world_location[1] + int(15 * _s), "arcarum_sandbox_the_world")
-            Game.wait(3.0)
-            return None
+            if "The World" in Settings.mission_name:
+                # 進場預設選中中央 The World，底部列會顯示它；直接找該列。
+                world_location = ImageUtils.find_button("arcarum_sandbox_the_world", tries = 3, suppress_error = True)
+                if world_location is None:
+                    # 底部沒顯示 The World（遊戲可能記住了上次選的其他節點）→
+                    # 點地圖中央的 The World 球選中它再試。中央球相對 home_menu 的
+                    # 偏移是 1 倍縮放量測 (-204, +207)，乘縮放比例。
+                    MessageLog.print_message("[ARCARUM.SANDBOX] 底部未顯示 The World，點中央球重新選中...")
+                    home_location = ImageUtils.find_button("home_menu", tries = 5)
+                    if home_location is not None:
+                        MouseUtils.move_and_click_point(home_location[0] - int(204 * _s), home_location[1] + int(207 * _s), "arcarum_the_world_orb")
+                        Game.wait(2.0)
+                    world_location = ImageUtils.find_button("arcarum_sandbox_the_world", tries = 5)
+                if world_location is None:
+                    raise ArcarumSandboxException("Failed to find The World mission row in Zone Mundus.")
+                # 從「The World」文字中心往右到「>」箭頭的偏移（1 倍縮放量測，乘縮放比例）
+                MouseUtils.move_and_click_point(world_location[0] + int(235 * _s), world_location[1] + int(15 * _s), "arcarum_sandbox_the_world")
+                Game.wait(3.0)
+                return None
+            else:
+                ArcarumSandbox._navigate_mundus_element()
+                return None
 
         # Now that the Zone is on screen, have the bot move all the way to the left side of the map.
         ArcarumSandbox._reset_position()
@@ -584,6 +589,62 @@ class ArcarumSandbox:
         ArcarumSandbox._navigate_to_mission()
 
         return None
+
+    @staticmethod
+    def _navigate_mundus_element():
+        """Zone Mundus 元素節點掃描：找一個「可挑戰」的節點，開它底部的
+        第一個關卡（通常是 Herald 增益王），用來刷 The World 的門票。
+
+        機制：可挑戰的節點上有「劍氣泡」標記（arcarum_sandbox_node_battle）。
+        先把地圖翻到最左，逐頁掃描；找到氣泡就點它下方的節點選中它，
+        底部關卡列出現後，找所有「>」箭頭（arcarum_sandbox_mission_go）
+        點最上面那個開打。今日打完的節點會沒有氣泡，自然換下一個。
+
+        座標偏移（氣泡→節點）為初版估值，需依實機 log/除錯截圖校準。
+        """
+        from bot.game import Game
+
+        MessageLog.print_message("\n[ARCARUM.SANDBOX] Mundus 元素掃描：尋找可挑戰的節點...")
+        _s = ImageUtils._template_scale
+
+        # 先把地圖翻到最左邊，讓掃描順序固定。
+        for _ in range(8):
+            if Game.find_and_click_button("arcarum_sandbox_left_arrow", tries = 1, suppress_error = True):
+                Game.wait(0.8)
+            else:
+                break
+
+        for _page in range(9):
+            bubbles = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.78)
+            if len(bubbles) > 0:
+                # 取最上、再最左的氣泡作為本次挑戰目標。
+                bubbles.sort(key = lambda p: (p[1], p[0]))
+                bx, by = bubbles[0]
+                MessageLog.print_message(f"[ARCARUM.SANDBOX] 本頁發現 {len(bubbles)} 個可挑戰節點，挑戰第一個...")
+                # 氣泡浮在節點上方，往下約 35px 是節點本體。
+                MouseUtils.move_and_click_point(bx, by + int(35 * _s), "arcarum_mundus_node")
+                Game.wait(2.0)
+
+                # 底部關卡列：找所有「>」箭頭，點最上面那個（第一個關卡）。
+                arrows = ImageUtils.find_all("arcarum_sandbox_mission_go", custom_confidence = 0.72)
+                if len(arrows) > 0:
+                    arrows.sort(key = lambda p: p[1])
+                    ax, ay = arrows[0]
+                    MouseUtils.move_and_click_point(ax, ay, "arcarum_mission_go")
+                    Game.wait(2.0)
+                    return None
+
+                MessageLog.print_message("[ARCARUM.SANDBOX] 選了節點但底部找不到關卡箭頭，存除錯圖後往右翻頁...")
+                ImageUtils.save_debug_screenshot("mundus_no_arrow")
+
+            # 本頁沒有可打的節點（或選了沒出關卡）→ 往右翻頁再找。
+            if Game.find_and_click_button("arcarum_sandbox_right_arrow", tries = 1, suppress_error = True):
+                Game.wait(1.0)
+            else:
+                break
+
+        ImageUtils.save_debug_screenshot("mundus_no_node")
+        raise ArcarumSandboxException("Mundus: 找不到可挑戰的元素節點（可能今日已全部打完）。")
 
     @staticmethod
     def _refill_aap():
