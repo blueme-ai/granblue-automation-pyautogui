@@ -615,12 +615,13 @@ class ArcarumSandbox:
                 break
 
         for _page in range(9):
-            bubbles = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.78)
+            bubbles = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.70)
             if len(bubbles) > 0:
-                # 取最上、再最左的氣泡作為本次挑戰目標。
+                # 依上→下、左→右排序，並用已完成次數輪替目標，避免一直打同一個節點。
                 bubbles.sort(key = lambda p: (p[1], p[0]))
-                bx, by = bubbles[0]
-                MessageLog.print_message(f"[ARCARUM.SANDBOX] 本頁發現 {len(bubbles)} 個可挑戰節點，挑戰第一個...")
+                idx = Settings.item_amount_farmed % len(bubbles)
+                bx, by = bubbles[idx]
+                MessageLog.print_message(f"[ARCARUM.SANDBOX] 本頁發現 {len(bubbles)} 個可挑戰節點，挑戰第 {idx + 1} 個...")
                 # 劍氣泡浮在節點的「右上方」，節點龍本體在氣泡的左下方
                 # （實測偏移約 -40, +30，乘縮放比例）。點節點才會讓底部關卡列
                 # 切換成該節點的怪（否則底部沿用上次打的，會誤打 The World）。
