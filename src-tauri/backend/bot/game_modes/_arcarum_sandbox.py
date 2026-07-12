@@ -663,8 +663,11 @@ class ArcarumSandbox:
                 MessageLog.print_message(f"[ARCARUM.SANDBOX] 本視角發現 {len(bubbles)} 個可挑戰節點（起始翻頁 {start_pan}）...")
             for (bx, by) in bubbles:
                 arrows = _select_node(bx, by)
-                if arrows is not None and handle_selected(arrows):
-                    return True
+                if arrows is not None:
+                    # 存下每個選中節點的面板（供收集怪名模板／診斷用）。
+                    ImageUtils.save_debug_screenshot("mundus_panel")
+                    if handle_selected(arrows):
+                        return True
             # 本視角處理不成 → 往右翻頁換視角；到最右繞回最左。
             if Game.find_and_click_button("arcarum_sandbox_right_arrow", tries = 1, suppress_error = True):
                 Game.wait(1.0)
@@ -711,7 +714,7 @@ class ArcarumSandbox:
         MessageLog.print_message(f"\n[ARCARUM.SANDBOX] Mundus 指定單刷「{target_name}」...")
 
         def handle(arrows):
-            name_loc = ImageUtils.find_button(tmpl, tries = 1, suppress_error = True)
+            name_loc = ImageUtils.find_button(tmpl, custom_confidence = 0.75, tries = 1, suppress_error = True)
             if name_loc is None:
                 return False  # 這個節點的關卡列沒有目標怪 → 換下一個。
             ImageUtils.save_debug_screenshot("mundus_target_found")
