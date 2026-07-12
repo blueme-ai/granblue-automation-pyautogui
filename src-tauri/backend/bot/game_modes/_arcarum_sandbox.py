@@ -598,18 +598,20 @@ class ArcarumSandbox:
     def _mundus_scan(handle_selected) -> bool:
         """通用的 Zone Mundus 節點掃描。
 
-        可挑戰的節點上有「劍氣泡」標記（arcarum_sandbox_node_battle）。先翻到
-        最左、依 start_pan 起始位置（用已完成次數輪替以覆蓋全地圖），逐視角、
-        逐節點嘗試選中（多候選偏移；成功＝底部出現關卡「>」箭頭 且 不是中央
+        可挑戰的節點上有「劍氣泡」標記（arcarum_sandbox_node_battle）。逐節點
+        嘗試選中（多候選偏移；成功＝底部出現關卡「>」箭頭 且 不是中央
         The World，避免誤打世界）。選中後把該節點的箭頭清單交給 handle_selected
-        處理，回傳 True 代表已處理完成（結束掃描）。整圈都沒處理成功回傳 False。
+        處理，回傳 True 代表已處理完成（結束掃描）。整圖都沒處理成功回傳 False。
 
-        兩個關鍵行為（實測得知）：
+        三個關鍵行為（實測得知）：
         - 底部面板會殘留上一個選中節點的內容，必須比對點擊前後面板有沒有變，
           否則沒點中也會被誤判成功。
         - 選中偏離視角中央的節點時，遊戲會把地圖平移置中該節點、面板延遲
           1~4 秒才更新——所以要輪詢等待面板變化，且每次成功選中後氣泡座標
           全部失效，必須重新偵測。
+        - 左右翻頁箭頭點了沒有作用；地圖要用滑鼠水平拖曳來平移（手機式操作），
+          走圖＝先往左拖到底、再往右拖到底。被裁在視窗邊緣的節點點不中，
+          拖到視窗內就能點。
         """
         from bot.game import Game
         import cv2
@@ -638,13 +640,17 @@ class ArcarumSandbox:
 
         def _select_node(bx, by):
             # 回傳 (箭頭清單, 面板影像)；沒選中回傳 None。
-            for (dx, dy) in ((-40, 30), (0, 38), (-45, 20), (30, 35)):
+            for offset_index, (dx, dy) in enumerate(((-40, 30), (0, 38), (-45, 20), (30, 35))):
                 before = _panel_band()
                 MouseUtils.move_and_click_point(bx + int(dx * _s), by + int(dy * _s), "arcarum_mundus_node")
                 # 選中偏離中央的節點會觸發地圖置中動畫，面板最慢 4 秒左右才換，
-                # 用輪詢等待；一變就提早跳出。
+                # 用輪詢等待；一變就提早跳出。第一個偏移是量測過的節點幾何位置
+                # （氣泡左下 -40,+30），等好等滿；後備偏移命中率低，短輪詢即可，
+                # 免得沒點中的氣泡（被裁在視角邊緣、或已選中節點自己的氣泡）
+                # 白耗半分鐘。
+                polls = 6 if offset_index == 0 else 2
                 after = before
-                for _ in range(6):
+                for _ in range(polls):
                     Game.wait(0.8)
                     after = _panel_band()
                     if not _band_same(before, after):
@@ -661,18 +667,6 @@ class ArcarumSandbox:
             return None
 
         _clear_popups()
-        for _ in range(8):
-            if Game.find_and_click_button("arcarum_sandbox_left_arrow", tries = 1, suppress_error = True):
-                Game.wait(0.7)
-            else:
-                break
-
-        start_pan = Settings.item_amount_farmed % 6
-        for _ in range(start_pan):
-            if Game.find_and_click_button("arcarum_sandbox_right_arrow", tries = 1, suppress_error = True):
-                Game.wait(0.7)
-            else:
-                break
 
         # 遊戲可能記住上次選中的節點（面板已經顯示它）。點已選中的節點面板
         # 不會變、會被面板變化檢查略過，所以先把「目前已選中的面板」交給
@@ -684,7 +678,52 @@ class ArcarumSandbox:
                 if handle_selected(arrows):
                     return True
 
-        for _view in range(10):
+        # 地圖移動不能靠左右箭頭（實測點了不會動——之前「翻頁」其實都是
+        # 選中節點觸發的重新置中）。實測地圖可以用滑鼠「水平拖曳」平移
+        # （手機式操作），而且拖過去之後原本被裁在視窗邊緣、點不中的節點
+        # 會變成完整可點。走法：先一路拖到最左端（不點任何東西），再由左
+        # 往右單向掃過去＝確定性的全圖覆蓋（選中節點會讓遊戲把地圖置中回
+        # 該節點，雙向走法會被這個置中拉扯來回抵消，單向掃不會）。
+
+        def _bubbles_moved(a, b) -> bool:
+            if len(a) != len(b):
+                return True
+            a = sorted(a)
+            b = sorted(b)
+            return any(abs(pa[0] - pb[0]) > 25 or abs(pa[1] - pb[1]) > 25 for pa, pb in zip(a, b))
+
+        def _drag_map(direction) -> bool:
+            # 在地圖空白處水平拖曳平移視窗（拖曳不會觸發點擊選節點）。
+            # 要看左邊＝把地圖往右拖，反之亦然。回傳氣泡有沒有移動。
+            # 拖曳起點若剛好按在節點上會拖不動，所以準備多個起點輪流試；
+            # 全部起點都拖不動＝地圖已到這個方向的盡頭。
+            import pyautogui
+            win_left, win_top, win_width, win_height = ImageUtils.get_window_dimensions()
+            for (fx1, fx2, fy) in ((0.18, 0.72, 0.29), (0.24, 0.72, 0.325), (0.30, 0.70, 0.205)):
+                before = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.70)
+                y = win_top + int(win_height * fy)
+                x1 = win_left + int(win_width * fx1)
+                x2 = win_left + int(win_width * fx2)
+                start, end = (x1, x2) if direction == "left" else (x2, x1)
+                # 遊戲會把地圖吸附回欄位位置，單次拖曳實際只前進一小段；
+                # 連拖兩次確保邊緣被裁切的節點完整進到視窗內（否則點不中）。
+                for _ in range(2):
+                    pyautogui.moveTo(start, y, duration = 0.2)
+                    pyautogui.dragTo(end, y, duration = 0.5, button = "left")
+                    Game.wait(1.2)
+                after = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.70)
+                if len(before) > 0 and len(after) > 0 and _bubbles_moved(before, after):
+                    return True
+            return False
+
+        # 第一階段：不點任何節點，一路拖到最左端（拖到氣泡位置不再變）。
+        for _ in range(8):
+            if not _drag_map("left"):
+                break
+        MessageLog.print_message("[ARCARUM.SANDBOX] 已拖到地圖最左端，開始由左往右掃描...")
+
+        # 第二階段：由左往右單向掃。
+        for _view in range(20):
             _clear_popups()
             # 先開這個視角看得到的寶箱（免費獎勵）。一般寶箱點 OK/Close 收下；
             # mimic 寶箱怪會進戰鬥——存除錯截圖供之後完善（目前先盡量收）。
@@ -709,9 +748,11 @@ class ArcarumSandbox:
             # 重新偵測氣泡。已檢查過的節點用面板指紋跳過，避免無窮迴圈。
             for _rescan in range(6):
                 bubbles = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.70)
-                bubbles.sort(key = lambda p: (p[1], p[0]))
+                # 由左往右掃：最左邊的先點，確保節點在被視窗甩出左邊界之前
+                # 一定被檢查過。
+                bubbles.sort(key = lambda p: (p[0], p[1]))
                 if _rescan == 0 and len(bubbles) > 0:
-                    MessageLog.print_message(f"[ARCARUM.SANDBOX] 本視角發現 {len(bubbles)} 個可挑戰節點（起始翻頁 {start_pan}）...")
+                    MessageLog.print_message(f"[ARCARUM.SANDBOX] 本視窗發現 {len(bubbles)} 個可挑戰節點...")
                 selected_new = False
                 for (bx, by) in bubbles:
                     result = _select_node(bx, by)
@@ -728,16 +769,11 @@ class ArcarumSandbox:
                     selected_new = True
                     break  # 地圖已因選中而移動，重新偵測氣泡再繼續。
                 if not selected_new:
-                    break  # 本視角沒有新節點可選了，翻頁換視角。
-            # 本視角處理不成 → 往右翻頁換視角；到最右繞回最左。
-            if Game.find_and_click_button("arcarum_sandbox_right_arrow", tries = 1, suppress_error = True):
-                Game.wait(1.0)
-            else:
-                for _ in range(8):
-                    if Game.find_and_click_button("arcarum_sandbox_left_arrow", tries = 1, suppress_error = True):
-                        Game.wait(0.7)
-                    else:
-                        break
+                    break  # 本視窗沒有新節點可選了，拖曳地圖移動視窗。
+            # 視窗內沒有新節點 → 往右拖曳地圖。拖不動＝已到最右端，掃完。
+            if not _drag_map("right"):
+                MessageLog.print_message("[ARCARUM.SANDBOX] 已掃到地圖最右端，全圖掃描完成。")
+                break
         return False
 
     @staticmethod
