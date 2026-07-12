@@ -603,8 +603,16 @@ class ArcarumSandbox:
         逐節點嘗試選中（多候選偏移；成功＝底部出現關卡「>」箭頭 且 不是中央
         The World，避免誤打世界）。選中後把該節點的箭頭清單交給 handle_selected
         處理，回傳 True 代表已處理完成（結束掃描）。整圈都沒處理成功回傳 False。
+
+        兩個關鍵行為（實測得知）：
+        - 底部面板會殘留上一個選中節點的內容，必須比對點擊前後面板有沒有變，
+          否則沒點中也會被誤判成功。
+        - 選中偏離視角中央的節點時，遊戲會把地圖平移置中該節點、面板延遲
+          1~4 秒才更新——所以要輪詢等待面板變化，且每次成功選中後氣泡座標
+          全部失效，必須重新偵測。
         """
         from bot.game import Game
+        import cv2
         _s = ImageUtils._template_scale
 
         def _clear_popups():
@@ -618,22 +626,38 @@ class ArcarumSandbox:
             height, width = image.shape
             return image[int(height * 0.48):int(height * 0.70), 0:int(width * 0.78)]
 
+        def _band_same(a, b) -> bool:
+            return a.shape == b.shape and float((cv2.absdiff(a, b) > 12).mean()) < 0.01
+
+        # 這一次掃描已經檢查過（handle_selected 回傳 False）的節點面板，
+        # 用面板影像當指紋，重複選中時直接跳過不再交給 handle。
+        seen_bands: list = []
+
+        def _band_seen(band) -> bool:
+            return any(_band_same(band, s) for s in seen_bands)
+
         def _select_node(bx, by):
-            # 回傳選中節點後底部的關卡箭頭清單；沒選中回傳 None。
-            # 注意：底部面板會殘留「上一個選中節點」的內容，光看「有箭頭且非
-            # The World」會把沒點中的情況誤判成功——必須確認面板內容有變。
-            import cv2
+            # 回傳 (箭頭清單, 面板影像)；沒選中回傳 None。
             for (dx, dy) in ((-40, 30), (0, 38), (-45, 20), (30, 35)):
                 before = _panel_band()
                 MouseUtils.move_and_click_point(bx + int(dx * _s), by + int(dy * _s), "arcarum_mundus_node")
-                Game.wait(2.0)
+                # 選中偏離中央的節點會觸發地圖置中動畫，面板最慢 4 秒左右才換，
+                # 用輪詢等待；一變就提早跳出。
+                after = before
+                for _ in range(6):
+                    Game.wait(0.8)
+                    after = _panel_band()
+                    if not _band_same(before, after):
+                        break
+                if _band_same(before, after):
+                    continue  # 面板沒變＝沒點中新節點（殘留面板），換下一個偏移再試。
+                Game.wait(0.7)  # 等置中動畫收尾，讓箭頭位置穩定
                 is_world = ImageUtils.find_button("arcarum_sandbox_the_world", tries = 1, suppress_error = True) is not None
                 arrows = ImageUtils.find_all("arcarum_sandbox_mission_go", custom_confidence = 0.72)
                 if len(arrows) > 0 and not is_world:
-                    after = _panel_band()
-                    if before.shape == after.shape and float((cv2.absdiff(before, after) > 12).mean()) < 0.01:
-                        continue  # 面板沒變＝沒點中新節點（殘留面板），換下一個偏移再試。
-                    return arrows
+                    return arrows, _panel_band()
+            # 所有偏移都沒選中：存地圖截圖（檔名帶氣泡座標）供校準點擊偏移。
+            ImageUtils.save_debug_screenshot(f"mundus_node_miss_{int(bx)}x{int(by)}")
             return None
 
         _clear_popups()
@@ -655,8 +679,10 @@ class ArcarumSandbox:
         # handle_selected 檢查一次。
         if ImageUtils.find_button("arcarum_sandbox_the_world", tries = 1, suppress_error = True) is None:
             arrows = ImageUtils.find_all("arcarum_sandbox_mission_go", custom_confidence = 0.72)
-            if len(arrows) > 0 and handle_selected(arrows):
-                return True
+            if len(arrows) > 0:
+                seen_bands.append(_panel_band())
+                if handle_selected(arrows):
+                    return True
 
         for _view in range(10):
             _clear_popups()
@@ -679,17 +705,30 @@ class ArcarumSandbox:
                     Game.find_and_click_button("close", tries = 2, suppress_error = True)
                     Game.wait(1.0)
 
-            bubbles = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.70)
-            bubbles.sort(key = lambda p: (p[1], p[0]))
-            if len(bubbles) > 0:
-                MessageLog.print_message(f"[ARCARUM.SANDBOX] 本視角發現 {len(bubbles)} 個可挑戰節點（起始翻頁 {start_pan}）...")
-            for (bx, by) in bubbles:
-                arrows = _select_node(bx, by)
-                if arrows is not None:
+            # 每次成功選中節點地圖都會重新置中（座標全變），所以選中一個就
+            # 重新偵測氣泡。已檢查過的節點用面板指紋跳過，避免無窮迴圈。
+            for _rescan in range(6):
+                bubbles = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.70)
+                bubbles.sort(key = lambda p: (p[1], p[0]))
+                if _rescan == 0 and len(bubbles) > 0:
+                    MessageLog.print_message(f"[ARCARUM.SANDBOX] 本視角發現 {len(bubbles)} 個可挑戰節點（起始翻頁 {start_pan}）...")
+                selected_new = False
+                for (bx, by) in bubbles:
+                    result = _select_node(bx, by)
+                    if result is None:
+                        continue
+                    arrows, band = result
+                    if _band_seen(band):
+                        continue  # 這個節點這輪已檢查過（重複選中），換下一顆氣泡。
+                    seen_bands.append(band)
                     # 存下每個選中節點的面板（供收集怪名模板／診斷用）。
                     ImageUtils.save_debug_screenshot("mundus_panel")
                     if handle_selected(arrows):
                         return True
+                    selected_new = True
+                    break  # 地圖已因選中而移動，重新偵測氣泡再繼續。
+                if not selected_new:
+                    break  # 本視角沒有新節點可選了，翻頁換視角。
             # 本視角處理不成 → 往右翻頁換視角；到最右繞回最左。
             if Game.find_and_click_button("arcarum_sandbox_right_arrow", tries = 1, suppress_error = True):
                 Game.wait(1.0)
