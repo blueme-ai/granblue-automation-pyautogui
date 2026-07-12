@@ -611,14 +611,28 @@ class ArcarumSandbox:
             Game.find_and_click_button("close", tries = 1, suppress_error = True)
             Game.find_and_click_button("cancel", tries = 1, suppress_error = True)
 
+        def _panel_band():
+            # 底部關卡面板所在的畫面帶（避開會動畫的地圖區），用來比對點擊前後
+            # 面板是否真的換了內容。
+            image = ImageUtils._grab_screen()
+            height, width = image.shape
+            return image[int(height * 0.48):int(height * 0.70), 0:int(width * 0.78)]
+
         def _select_node(bx, by):
             # 回傳選中節點後底部的關卡箭頭清單；沒選中回傳 None。
+            # 注意：底部面板會殘留「上一個選中節點」的內容，光看「有箭頭且非
+            # The World」會把沒點中的情況誤判成功——必須確認面板內容有變。
+            import cv2
             for (dx, dy) in ((-40, 30), (0, 38), (-45, 20), (30, 35)):
+                before = _panel_band()
                 MouseUtils.move_and_click_point(bx + int(dx * _s), by + int(dy * _s), "arcarum_mundus_node")
                 Game.wait(2.0)
                 is_world = ImageUtils.find_button("arcarum_sandbox_the_world", tries = 1, suppress_error = True) is not None
                 arrows = ImageUtils.find_all("arcarum_sandbox_mission_go", custom_confidence = 0.72)
                 if len(arrows) > 0 and not is_world:
+                    after = _panel_band()
+                    if before.shape == after.shape and float((cv2.absdiff(before, after) > 12).mean()) < 0.01:
+                        continue  # 面板沒變＝沒點中新節點（殘留面板），換下一個偏移再試。
                     return arrows
             return None
 
@@ -635,6 +649,14 @@ class ArcarumSandbox:
                 Game.wait(0.7)
             else:
                 break
+
+        # 遊戲可能記住上次選中的節點（面板已經顯示它）。點已選中的節點面板
+        # 不會變、會被面板變化檢查略過，所以先把「目前已選中的面板」交給
+        # handle_selected 檢查一次。
+        if ImageUtils.find_button("arcarum_sandbox_the_world", tries = 1, suppress_error = True) is None:
+            arrows = ImageUtils.find_all("arcarum_sandbox_mission_go", custom_confidence = 0.72)
+            if len(arrows) > 0 and handle_selected(arrows):
+                return True
 
         for _view in range(10):
             _clear_popups()
@@ -714,7 +736,9 @@ class ArcarumSandbox:
         MessageLog.print_message(f"\n[ARCARUM.SANDBOX] Mundus 指定單刷「{target_name}」...")
 
         def handle(arrows):
-            name_loc = ImageUtils.find_button(tmpl, custom_confidence = 0.75, tries = 1, suppress_error = True)
+            # 0.85：Herald 系名字共用「Herald of」前綴，彼此交叉匹配可達 0.80，
+            # 0.75 會把別的 Herald 誤認成目標；正確匹配實測 0.99+。
+            name_loc = ImageUtils.find_button(tmpl, custom_confidence = 0.85, tries = 1, suppress_error = True)
             if name_loc is None:
                 return False  # 這個節點的關卡列沒有目標怪 → 換下一個。
             ImageUtils.save_debug_screenshot("mundus_target_found")
