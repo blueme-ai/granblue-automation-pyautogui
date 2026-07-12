@@ -638,6 +638,25 @@ class ArcarumSandbox:
 
         for _view in range(10):
             _clear_popups()
+            # 先開這個視角看得到的寶箱（免費獎勵）。一般寶箱點 OK/Close 收下；
+            # mimic 寶箱怪會進戰鬥——存除錯截圖供之後完善（目前先盡量收）。
+            chest = ImageUtils.find_button("arcarum_mundus_chest", tries = 1, suppress_error = True)
+            if chest is not None:
+                MessageLog.print_message("[ARCARUM.SANDBOX] 發現寶箱，開啟收獎...")
+                MouseUtils.move_and_click_point(chest[0], chest[1], "arcarum_mundus_chest")
+                Game.wait(2.0)
+                ImageUtils.save_debug_screenshot("mundus_chest_opened")
+                if Game.find_and_click_button("mimic", tries = 1, suppress_error = True):
+                    # mimic 寶箱怪 → 交給既有選節點/戰鬥流程處理。
+                    Game.wait(2.0)
+                    arrows = ImageUtils.find_all("arcarum_sandbox_mission_go", custom_confidence = 0.72)
+                    if len(arrows) > 0 and handle_selected(arrows):
+                        return True
+                else:
+                    Game.find_and_click_button("ok", tries = 2, suppress_error = True)
+                    Game.find_and_click_button("close", tries = 2, suppress_error = True)
+                    Game.wait(1.0)
+
             bubbles = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.70)
             bubbles.sort(key = lambda p: (p[1], p[0]))
             if len(bubbles) > 0:
