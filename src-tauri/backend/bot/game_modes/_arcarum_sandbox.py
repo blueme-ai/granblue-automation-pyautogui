@@ -638,12 +638,22 @@ class ArcarumSandbox:
         def _band_seen(band) -> bool:
             return any(_band_same(band, s) for s in seen_bands)
 
+        def _find_bubbles():
+            # 可挑戰節點的標記有兩種：平常的「劍氣泡」；活動期間（如 2026-07
+            # Tales of Arcarum）部分節點的氣泡會換成「活動獎章氣泡」（該節點
+            # 掉活動素材）——只認劍氣泡會把大半節點當空氣（run-20260715-205226
+            # 實測：18 輪全圖掃描找不到 Tide Caller，就是它的氣泡被換成獎章）。
+            # 兩種氣泡對節點中心的幾何位置相同，共用同一組點擊偏移。
+            bubbles = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.70)
+            bubbles += ImageUtils.find_all("arcarum_sandbox_node_event", custom_confidence = 0.70)
+            return bubbles
+
         def _refresh_bubble(bx, by):
             # 地圖會自己平移（選中節點的置中動畫、彈窗收掉後的回彈——
             # run-174938 實測回彈約 78px），偵測到的氣泡座標很快就過期，
             # 點下去全落在背景上。每次點擊前重新找「原座標附近」的氣泡；
             # 找不到＝地圖已經移走，這顆氣泡的座標作廢。
-            candidates = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.70)
+            candidates = _find_bubbles()
             best = None
             for (cx, cy) in candidates:
                 d = abs(cx - bx) + abs(cy - by)
@@ -724,7 +734,7 @@ class ArcarumSandbox:
             import pyautogui
             win_left, win_top, win_width, win_height = ImageUtils.get_window_dimensions()
             for (fx1, fx2, fy) in ((0.18, 0.72, 0.29), (0.24, 0.72, 0.325), (0.30, 0.70, 0.205)):
-                before = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.70)
+                before = _find_bubbles()
                 y = win_top + int(win_height * fy)
                 x1 = win_left + int(win_width * fx1)
                 x2 = win_left + int(win_width * fx2)
@@ -735,7 +745,7 @@ class ArcarumSandbox:
                     pyautogui.moveTo(start, y, duration = 0.2)
                     pyautogui.dragTo(end, y, duration = 0.5, button = "left")
                     Game.wait(1.2)
-                after = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.70)
+                after = _find_bubbles()
                 if len(before) > 0 and len(after) > 0 and _bubbles_moved(before, after):
                     return True
             return False
@@ -771,7 +781,7 @@ class ArcarumSandbox:
             # 每次成功選中節點地圖都會重新置中（座標全變），所以選中一個就
             # 重新偵測氣泡。已檢查過的節點用面板指紋跳過，避免無窮迴圈。
             for _rescan in range(6):
-                bubbles = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.70)
+                bubbles = _find_bubbles()
                 # 由左往右掃：最左邊的先點，確保節點在被視窗甩出左邊界之前
                 # 一定被檢查過。
                 bubbles.sort(key = lambda p: (p[0], p[1]))
