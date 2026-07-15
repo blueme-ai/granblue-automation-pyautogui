@@ -638,16 +638,35 @@ class ArcarumSandbox:
         def _band_seen(band) -> bool:
             return any(_band_same(band, s) for s in seen_bands)
 
+        def _refresh_bubble(bx, by):
+            # 地圖會自己平移（選中節點的置中動畫、彈窗收掉後的回彈——
+            # run-174938 實測回彈約 78px），偵測到的氣泡座標很快就過期，
+            # 點下去全落在背景上。每次點擊前重新找「原座標附近」的氣泡；
+            # 找不到＝地圖已經移走，這顆氣泡的座標作廢。
+            candidates = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.70)
+            best = None
+            for (cx, cy) in candidates:
+                d = abs(cx - bx) + abs(cy - by)
+                if d <= 55 * _s and (best is None or d < best[0]):
+                    best = (d, cx, cy)
+            return (best[1], best[2]) if best is not None else None
+
         def _select_node(bx, by):
-            # 回傳 (箭頭清單, 面板影像)；沒選中回傳 None。
-            for offset_index, (dx, dy) in enumerate(((-40, 30), (0, 38), (-45, 20), (30, 35))):
+            # 回傳 (箭頭清單, 面板影像)；沒點中回傳 None；地圖移動導致座標
+            # 過期回傳 "moved"（外層要立刻重新偵測氣泡，不是換下一顆）。
+            # 偏移全部緊貼節點實際位置（氣泡左下約 -50,+30）——偏到氣泡上
+            # 會打開任務資訊彈窗，把後面的點擊全部吃掉。
+            for offset_index, (dx, dy) in enumerate(((-40, 30), (-52, 28), (-26, 36))):
+                fresh = _refresh_bubble(bx, by)
+                if fresh is None:
+                    return "moved"
+                bx, by = fresh
                 before = _panel_band()
                 MouseUtils.move_and_click_point(bx + int(dx * _s), by + int(dy * _s), "arcarum_mundus_node")
                 # 選中偏離中央的節點會觸發地圖置中動畫，面板最慢 4 秒左右才換，
-                # 用輪詢等待；一變就提早跳出。第一個偏移是量測過的節點幾何位置
-                # （氣泡左下 -40,+30），等好等滿；後備偏移命中率低，短輪詢即可，
-                # 免得沒點中的氣泡（被裁在視角邊緣、或已選中節點自己的氣泡）
-                # 白耗半分鐘。
+                # 用輪詢等待；一變就提早跳出。第一個偏移是量測過的幾何位置，
+                # 等好等滿；後備偏移命中率低，短輪詢就好（已選中節點自己的
+                # 氣泡怎麼點面板都不會變，別在它身上耗時間）。
                 polls = 6 if offset_index == 0 else 2
                 after = before
                 for _ in range(polls):
@@ -656,12 +675,17 @@ class ArcarumSandbox:
                     if not _band_same(before, after):
                         break
                 if _band_same(before, after):
-                    continue  # 面板沒變＝沒點中新節點（殘留面板），換下一個偏移再試。
+                    # 面板沒變＝沒點中新節點（殘留面板）。可能誤開了任務資訊
+                    # 彈窗（點到氣泡/資訊圖示會跳出來吃掉點擊），先清掉再試。
+                    _clear_popups()
+                    continue
                 Game.wait(0.7)  # 等置中動畫收尾，讓箭頭位置穩定
                 is_world = ImageUtils.find_button("arcarum_sandbox_the_world", tries = 1, suppress_error = True) is not None
                 arrows = ImageUtils.find_all("arcarum_sandbox_mission_go", custom_confidence = 0.72)
                 if len(arrows) > 0 and not is_world:
                     return arrows, _panel_band()
+                # 面板變了卻沒有箭頭＝多半是任務資訊彈窗蓋住畫面，清掉再試。
+                _clear_popups()
             # 所有偏移都沒選中：存地圖截圖（檔名帶氣泡座標）供校準點擊偏移。
             ImageUtils.save_debug_screenshot(f"mundus_node_miss_{int(bx)}x{int(by)}")
             return None
@@ -753,9 +777,14 @@ class ArcarumSandbox:
                 bubbles.sort(key = lambda p: (p[0], p[1]))
                 if _rescan == 0 and len(bubbles) > 0:
                     MessageLog.print_message(f"[ARCARUM.SANDBOX] 本視窗發現 {len(bubbles)} 個可挑戰節點...")
-                selected_new = False
+                progressed = False  # 選中新節點或地圖移動＝氣泡清單要重偵測。
                 for (bx, by) in bubbles:
                     result = _select_node(bx, by)
+                    if result == "moved":
+                        # 地圖移走了（置中/回彈），這批座標全部過期——
+                        # 立刻重新偵測，別再拿舊座標點空氣。
+                        progressed = True
+                        break
                     if result is None:
                         continue
                     arrows, band = result
@@ -766,9 +795,9 @@ class ArcarumSandbox:
                     ImageUtils.save_debug_screenshot("mundus_panel")
                     if handle_selected(arrows):
                         return True
-                    selected_new = True
+                    progressed = True
                     break  # 地圖已因選中而移動，重新偵測氣泡再繼續。
-                if not selected_new:
+                if not progressed:
                     break  # 本視窗沒有新節點可選了，拖曳地圖移動視窗。
             # 視窗內沒有新節點 → 往右拖曳地圖。拖不動＝已到最右端，掃完。
             if not _drag_map("right"):
