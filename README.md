@@ -161,8 +161,10 @@ src-tauri/backend/.venv/Scripts/pip install PySide6
 機制已就緒：GUI 設定「遊戲語言 → 日本語」後，圖像比對會優先使用
 `src-tauri/images/buttons_jp/`、`headers_jp/` 下的模板，缺圖自動退回英文版模板。
 
-純圖示按鈕跨語言通用；**含文字的按鈕需要日文版截圖裁模板**，
-製作方式見 [src-tauri/images/buttons_jp/README.md](src-tauri/images/buttons_jp/README.md)。
+純圖示按鈕跨語言通用；**含文字的按鈕需要日文版截圖裁模板**。
+模板可用半自動流程擷取：英文/日文版各截一輪同樣的畫面，工具會自動
+定位、裁切並過濾掉語言通用的元件——完整步驟見
+[tools/jp_capture_flow.md](tools/jp_capture_flow.md)（工具：`tools/jp_ui_capture.py`）。
 
 ## 常見問題
 
