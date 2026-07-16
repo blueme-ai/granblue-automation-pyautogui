@@ -30,6 +30,7 @@ def main():
     ap.add_argument("--rounds", type = int, default = 2)
     ap.add_argument("--lang", default = "jp")
     ap.add_argument("--bosses", default = None, help = "逗號分隔；預設 12 隻定點怪")
+    ap.add_argument("--timeout", type = int, default = 25, help = "單隻逾時（分鐘），逾時 taskkill 整棵樹")
     args = ap.parse_args()
 
     bosses = [b.strip() for b in args.bosses.split(",")] if args.bosses else DEFAULT_BOSSES
@@ -47,8 +48,24 @@ def main():
 
         print(f"\n===== [{i}/{len(bosses)}] {boss} x{args.rounds} =====", flush = True)
         t0 = time.time()
-        proc = subprocess.run([PYTHON, "-X", "utf8", os.path.join(HERE, "main.py"), cfg_path],
-                              cwd = SRC_TAURI, capture_output = True, text = True, encoding = "utf-8", errors = "replace")
+        # 逾時保護：單隻超時就 taskkill 整棵樹（multiprocessing 子行程握滑鼠），
+        # 避免像 jp sweep 首測那樣「掃不到→無限重試」空轉整晚。
+        popen = subprocess.Popen([PYTHON, "-X", "utf8", os.path.join(HERE, "main.py"), cfg_path],
+                                 cwd = SRC_TAURI, stdout = subprocess.PIPE, stderr = subprocess.STDOUT,
+                                 text = True, encoding = "utf-8", errors = "replace")
+        try:
+            stdout, _ = popen.communicate(timeout = args.timeout * 60)
+        except subprocess.TimeoutExpired:
+            subprocess.run(["taskkill", "/PID", str(popen.pid), "/T", "/F"], capture_output = True)
+            try:
+                stdout, _ = popen.communicate(timeout = 15)
+            except Exception:
+                stdout = ""
+            stdout = (stdout or "") + f"\n[QUEUE] TIMEOUT {args.timeout}min，已 taskkill 整棵樹。"
+        class _P:  # 統一介面
+            returncode = popen.returncode if popen.returncode is not None else 124
+        proc = _P()
+        proc.stdout, proc.stderr = stdout, ""
         dt = int(time.time() - t0)
         out = (proc.stdout or "") + (proc.stderr or "")
         farmed = out.count("Amount of items farmed") or None
