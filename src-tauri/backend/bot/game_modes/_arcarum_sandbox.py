@@ -825,12 +825,15 @@ class ArcarumSandbox:
         MessageLog.print_message("\n[ARCARUM.SANDBOX] Mundus 元素掃描：尋找有每日次數的節點...")
 
         def handle(arrows):
-            if ImageUtils.find_button("arcarum_sandbox_attempts_left", tries = 1, suppress_error = True) is None:
+            attempts = ImageUtils.find_button("arcarum_sandbox_attempts_left", tries = 1, suppress_error = True)
+            if attempts is None:
                 MessageLog.print_message("[ARCARUM.SANDBOX] 此節點每日關卡已打完（只剩無限 Defender），跳過。")
                 return False
             ImageUtils.save_debug_screenshot("mundus_after_node_click")
-            # 每日關卡在最上（Herald→每日 Militis），無限 Defender 在下。
-            arrows.sort(key = lambda p: p[1])
+            # 點「挑戦可能回数/Attempts Left 同一列」的箭頭（每日關卡）。
+            # 不能點最上面的箭頭：ミッション/導本按鈕列的鍍金邊在發光動畫幀
+            # 會被誤認成箭頭（0.8+），排在最上面（jp sweep 實測誤點進任務頁）。
+            arrows.sort(key = lambda p: abs(p[1] - attempts[1]))
             MouseUtils.move_and_click_point(arrows[0][0], arrows[0][1], "arcarum_mission_go")
             Game.wait(2.0)
             return True
