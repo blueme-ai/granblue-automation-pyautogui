@@ -74,7 +74,7 @@ def build_settings(
             "delayBetweenRunsLowerBound": opt.get("delay_lower", 15),
             "delayBetweenRunsUpperBound": opt.get("delay_upper", 60),
             "enableRefreshDuringCombat": opt.get("refresh_during_combat", True),
-            "enableAutoQuickSummon": opt.get("auto_quick_summon", False),
+            "enableAutoQuickSummon": opt.get("auto_quick_summon", True),
             "enableBypassResetSummon": opt.get("bypass_reset_summon", False),
             "staticWindow": opt.get("static_window", True),
             "enableMouseSecurityAttemptBypass": opt.get("anti_detection", False),

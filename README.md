@@ -116,7 +116,7 @@ src-tauri/backend/.venv/Scripts/pip install PySide6
 
 **戰鬥選項**
 - **戰鬥中刷新**：auto／FA 攻擊後刷新頁面（較穩、防卡）。
-- **自動施放快速召喚石**：進戰鬥先放快速召喚再攻擊（召喚未充能時自動略過）。
+- **自動施放快速召喚石**（**預設開啟**）：所有戰鬥入口（Full Auto、Semi Auto、腳本指令 enablefullauto／enablesemiauto）開打前都會先嘗試快速召喚，未充能時自動略過；5 秒內不重複觸發（防止 fallback 路徑連續嘗試）。可在 GUI 的戰鬥選項取消勾選。
 - **找不到召喚石時自動選第一個**。
 
 **Raid 選項**

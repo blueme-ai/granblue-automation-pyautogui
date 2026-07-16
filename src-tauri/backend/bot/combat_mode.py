@@ -42,6 +42,7 @@ class CombatMode:
     _list_of_exit_events_for_true = ["Battle Concluded", "Exp Gained", "Loot Collected"]
     _command_turn_number = 1
     _turn_number = 1  # Current turn for the script execution.
+    _last_quick_summon_time: float = 0.0  # 防重複：記錄上次 _try_auto_quick_summon 的時間
 
     ######################################################################
     ######################################################################
@@ -399,11 +400,8 @@ class CombatMode:
 
         MessageLog.print_message(f"Settings.enable_refresh_during_combat {Settings.enable_refresh_during_combat}" )
         MessageLog.print_message(f"Settings.enable_auto_quick_summon {Settings.enable_auto_quick_summon}")
-        # 進戰鬥先嘗試快速召喚（若設定有勾），再開始攻擊。
-        # 只看 auto_quick_summon，不再綁定 refresh_during_combat（原本兩者都要勾才會放）。
-        if Settings.enable_auto_quick_summon:
-            MessageLog.print_message(f"[COMBAT] Automatically attempting to use Quick Summon...")
-            CombatMode._quick_summon()
+        # 進戰鬥先嘗試快速召喚（統一由 helper 處理設定判斷與防重複邏輯）。
+        CombatMode._try_auto_quick_summon()
 
         if is_ss:
             MessageLog.print_message(f"f5")
@@ -907,6 +905,26 @@ class CombatMode:
         return False
 
     @staticmethod
+    def _try_auto_quick_summon() -> None:
+        """若設定 enable_auto_quick_summon 為 True 且距上次嘗試超過 5 秒，則嘗試快速召喚。
+
+        這個 helper 統一被 _enable_auto / _enable_semi_auto / _enable_full_auto 呼叫，
+        避免 _enable_semi_auto 失敗 fallback 到 _enable_full_auto 時連續觸發兩次。
+        reload 路徑（line ~324-327）也會重複呼叫 _enable_full_auto，5 秒防重可避免空耗。
+
+        find_button 使用低 tries（2）並 suppress_error，確保未充能或非戰鬥畫面時快速跳過。
+        """
+        if not Settings.enable_auto_quick_summon:
+            return
+        now = time.time()
+        if now - CombatMode._last_quick_summon_time < 5.0:
+            MessageLog.print_message("[COMBAT] _try_auto_quick_summon: 5 秒內已嘗試過，略過。")
+            return
+        CombatMode._last_quick_summon_time = now
+        MessageLog.print_message("[COMBAT] 自動嘗試快速召喚（所有戰鬥入口）...")
+        CombatMode._quick_summon()
+
+    @staticmethod
     def _quick_summon(command: str = ""):
         """Activate a Quick Summon.
 
@@ -948,6 +966,8 @@ class CombatMode:
         """
         from bot.game import Game
 
+        # 進入 Semi Auto 前先嘗試快速召喚（5 秒防重，避免 fallback 到 _enable_full_auto 時重複觸發）。
+        CombatMode._try_auto_quick_summon()
         MessageLog.print_message("[COMBAT] Bot will now attempt to enable Semi Auto...")
         CombatMode._semi_auto = ImageUtils.find_button("semi_auto_enabled")
         if not CombatMode._semi_auto:
@@ -975,6 +995,8 @@ class CombatMode:
         """
         from bot.game import Game
 
+        # 進入 Full Auto 前先嘗試快速召喚（5 秒防重，避免 _enable_semi_auto 已試過後又重複觸發）。
+        CombatMode._try_auto_quick_summon()
         MessageLog.print_message("[COMBAT] Bot will now attempt to enable Full Auto...")
         Game.wait(2)
         CombatMode._full_auto = Game.find_and_click_button("full_auto",tries=10)

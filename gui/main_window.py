@@ -504,7 +504,7 @@ class MainWindow(QWidget):
         self.delay_lower_spin.setValue(opt.get("delay_lower", 15))
         self.delay_upper_spin.setValue(opt.get("delay_upper", 60))
         self.refresh_check.setChecked(opt.get("refresh_during_combat", True))
-        self.quick_summon_check.setChecked(opt.get("auto_quick_summon", False))
+        self.quick_summon_check.setChecked(opt.get("auto_quick_summon", True))
         self.bypass_summon_check.setChecked(opt.get("bypass_reset_summon", False))
         self.static_window_check.setChecked(opt.get("static_window", True))
         self.anti_detect_check.setChecked(opt.get("anti_detection", False))
