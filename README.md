@@ -25,6 +25,8 @@
 
 ## 安裝
 
+> macOS 使用者請參閱 **[docs/INSTALL_MAC.md](docs/INSTALL_MAC.md)**（含 Homebrew、venv 重建、系統權限授權等完整步驟）。
+
 ```bash
 git clone <this repo>
 cd granblue-automation-pyautogui
@@ -53,7 +55,8 @@ src-tauri/backend/.venv/Scripts/pip install PySide6
 
 ## 使用步驟
 
-1. **啟動 GUI**：Windows 直接雙擊根目錄的「啟動GUI.bat」
+1. **啟動 GUI**：Windows 直接雙擊根目錄的「啟動GUI.bat」；
+   macOS 雙擊「啟動GUI.command」（首次需在「隱私權與安全性」授權）
    （或 `python -X utf8 gui/main.py`）
 2. **開好遊戲**：瀏覽器登入 GBF，停在任何畫面都可以（機器人會自己回首頁），
    確認畫面底部的 Home 鍵沒被遮住
