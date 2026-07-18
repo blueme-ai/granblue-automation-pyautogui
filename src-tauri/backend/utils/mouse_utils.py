@@ -118,7 +118,13 @@ class MouseUtils:
         if Settings.debug_mode:
             MessageLog.print_message(f"[DEBUG] Old coordinates: ({x}, {y})")
 
-        new_x, new_y = MouseUtils._randomize_point(x, y, image_name)
+        # 精密小元素（翻頁箭頭、關卡「>」、量測過偏移的節點點擊）要點正中：
+        # ±30% 模板尺寸的防偵測隨機化常落在可點區外（用戶實況觀察到
+        # 「點在箭頭下面一點點」「點節點差一點點」就是它）。
+        if "arrow" in image_name or image_name in ("arcarum_mission_go", "arcarum_sandbox_mission_go", "arcarum_mundus_node"):
+            new_x, new_y = x, y
+        else:
+            new_x, new_y = MouseUtils._randomize_point(x, y, image_name)
 
         if Settings.debug_mode:
             MessageLog.print_message(f"[DEBUG] New coordinates: ({new_x}, {new_y})")

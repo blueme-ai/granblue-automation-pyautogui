@@ -594,6 +594,11 @@ class ArcarumSandbox:
 
         return None
 
+    # 每次掃描交替起點方向：pass 1 由左往右、pass 2 由右往左…
+    # 單輪掃描會被 stale 檢查提早收工（省時），遠端的 pan 只靠單向掃永遠
+    # 到不了（run-0912 實測 4 輪全從左端起步，右端節點一次都沒被檢查）。
+    _scan_from_left: bool = True
+
     @staticmethod
     def _mundus_scan(handle_selected) -> bool:
         """通用的 Zone Mundus 節點掃描。
@@ -603,19 +608,24 @@ class ArcarumSandbox:
         The World，避免誤打世界）。選中後把該節點的箭頭清單交給 handle_selected
         處理，回傳 True 代表已處理完成（結束掃描）。整圖都沒處理成功回傳 False。
 
-        三個關鍵行為（實測得知）：
+        關鍵行為（實測得知）：
         - 底部面板會殘留上一個選中節點的內容，必須比對點擊前後面板有沒有變，
           否則沒點中也會被誤判成功。
         - 選中偏離視角中央的節點時，遊戲會把地圖平移置中該節點、面板延遲
           1~4 秒才更新——所以要輪詢等待面板變化，且每次成功選中後氣泡座標
           全部失效，必須重新偵測。
-        - 左右翻頁箭頭點了沒有作用；地圖要用滑鼠水平拖曳來平移（手機式操作），
-          走圖＝先往左拖到底、再往右拖到底。被裁在視窗邊緣的節點點不中，
-          拖到視窗內就能點。
+        - 平移優先點左右翻頁箭頭（固定平移量、視角可重現，原版做法；用戶
+          指正拖曳每次位移不同），箭頭失效才用滑鼠水平拖曳當備援。
         """
         from bot.game import Game
         import cv2
         _s = ImageUtils._template_scale
+
+        # 這一輪的起點端與前進方向（輪替）。
+        from_left = ArcarumSandbox._scan_from_left
+        ArcarumSandbox._scan_from_left = not from_left
+        start_side = "left" if from_left else "right"
+        forward = "right" if from_left else "left"
 
         def _clear_popups():
             Game.find_and_click_button("close", tries = 1, suppress_error = True)
@@ -727,8 +737,21 @@ class ArcarumSandbox:
             return any(abs(pa[0] - pb[0]) > 25 or abs(pa[1] - pb[1]) > 25 for pa, pb in zip(a, b))
 
         def _drag_map(direction) -> bool:
+            # 平移地圖視窗。優先點左右翻頁箭頭——原版做法，固定平移量、
+            # 每次出來的畫面一致（用戶指正：拖曳每次位移都不同，視角不可
+            # 重現，覆蓋與定位都不穩）。箭頭沒認到或點了沒位移（例如到端點
+            # 箭頭消失/變灰）才退回滑鼠拖曳。回傳氣泡有沒有移動。
+            arrow = ImageUtils.find_button(f"arcarum_sandbox_{direction}_arrow", tries = 1, suppress_error = True)
+            if arrow is not None:
+                before = _find_bubbles()
+                MouseUtils.move_and_click_point(arrow[0], arrow[1], f"arcarum_sandbox_{direction}_arrow")
+                Game.wait(1.5)
+                after = _find_bubbles()
+                if len(before) > 0 and len(after) > 0 and _bubbles_moved(before, after):
+                    return True
+                # 箭頭點了沒位移 → 往下掉回拖曳再確認一次。
             # 在地圖空白處水平拖曳平移視窗（拖曳不會觸發點擊選節點）。
-            # 要看左邊＝把地圖往右拖，反之亦然。回傳氣泡有沒有移動。
+            # 要看左邊＝把地圖往右拖，反之亦然。
             # 拖曳起點若剛好按在節點上會拖不動，所以準備多個起點輪流試；
             # 全部起點都拖不動＝地圖已到這個方向的盡頭。
             import pyautogui
@@ -750,11 +773,28 @@ class ArcarumSandbox:
                     return True
             return False
 
-        # 第一階段：不點任何節點，一路拖到最左端（拖到氣泡位置不再變）。
+        # 第一階段：不點任何節點，一路平移到起點端（氣泡位置不再變＝到端）。
         for _ in range(8):
-            if not _drag_map("left"):
+            if not _drag_map(start_side):
                 break
-        MessageLog.print_message("[ARCARUM.SANDBOX] 已拖到地圖最左端，開始由左往右掃描...")
+        MessageLog.print_message(f"[ARCARUM.SANDBOX] 已移到地圖最{'左' if from_left else '右'}端，開始{'由左往右' if from_left else '由右往左'}掃描...")
+
+        # 本視角內點了沒反應的座標（幻影氣泡或已選中節點自己），rescan 直接跳過；
+        # 地圖一移動（拖曳/置中）座標基準就變，隨即清空。
+        dead_points: list = []
+
+        def _point_dead(bx, by) -> bool:
+            return any(abs(bx - dx) + abs(by - dy) <= 45 * _s for (dx, dy) in dead_points)
+
+        # 連續「重選到已檢查節點」的次數——每撞一次，往右逃離的拖曳步數就加一
+        # （上限 +2：拖太多步會跳過還沒掃的視角，run-0040 五隻失敗的主因之一）。
+        seen_streak = 0
+
+        # 連續「沒有選中任何新節點」的視角數。地圖最右端 snap-back 會讓
+        # 「拖不動＝掃完」永遠不觸發（run-0040 實測卡同一視角 19 分鐘），
+        # 用這個計數器兜底：連 3 個視角沒新節點＝這一輪掃完了，讓外層
+        # 重試重新導航再掃一輪（每輪起點不同，覆蓋互補）。
+        stale_views = 0
 
         # 第二階段：由左往右單向掃。
         for _view in range(20):
@@ -780,38 +820,76 @@ class ArcarumSandbox:
 
             # 每次成功選中節點地圖都會重新置中（座標全變），所以選中一個就
             # 重新偵測氣泡。已檢查過的節點用面板指紋跳過，避免無窮迴圈。
+            hit_seen = False
+            new_band_this_view = False
             for _rescan in range(6):
                 bubbles = _find_bubbles()
-                # 由左往右掃：最左邊的先點，確保節點在被視窗甩出左邊界之前
-                # 一定被檢查過。
-                bubbles.sort(key = lambda p: (p[0], p[1]))
+                # 靠近起點端的先點，確保節點在被視窗甩出邊界之前一定被檢查過。
+                bubbles.sort(key = lambda p: (p[0], p[1]), reverse = not from_left)
                 if _rescan == 0 and len(bubbles) > 0:
                     MessageLog.print_message(f"[ARCARUM.SANDBOX] 本視窗發現 {len(bubbles)} 個可挑戰節點...")
                 progressed = False  # 選中新節點或地圖移動＝氣泡清單要重偵測。
                 for (bx, by) in bubbles:
+                    if _point_dead(bx, by):
+                        continue  # 本視角已證實點不出東西（幻影氣泡/已選中節點），別再耗時間。
                     result = _select_node(bx, by)
                     if result == "moved":
                         # 地圖移走了（置中/回彈），這批座標全部過期——
                         # 立刻重新偵測，別再拿舊座標點空氣。
+                        dead_points.clear()
                         progressed = True
                         break
                     if result is None:
+                        # 三個偏移都點不出面板變化＝幻影氣泡（道路交叉紋被誤認，
+                        # run-2353 實測 (298,372) 每視角固定誤中）或已選中節點自己。
+                        # 記進黑名單，同一視角的 rescan 不再點它。
+                        dead_points.append((bx, by))
                         continue
                     arrows, band = result
                     if _band_seen(band):
-                        continue  # 這個節點這輪已檢查過（重複選中），換下一顆氣泡。
+                        # 重選到已檢查過的節點：選中動作已經把地圖拉回置中它，
+                        # 視窗又彈回掃過的區域。不能當一般「沒進展」只拖一步——
+                        # 下一輪最左的氣泡又是它、又被拉回來，會永遠困在原地
+                        # （jp 佇列 boss1/2 各 25 分鐘死循環的主因）。跳出去
+                        # 用遞增步數拖曳逃離。
+                        hit_seen = True
+                        break
                     seen_bands.append(band)
+                    seen_streak = 0
+                    new_band_this_view = True
                     # 存下每個選中節點的面板（供收集怪名模板／診斷用）。
                     ImageUtils.save_debug_screenshot("mundus_panel")
                     if handle_selected(arrows):
                         return True
                     progressed = True
                     break  # 地圖已因選中而移動，重新偵測氣泡再繼續。
-                if not progressed:
+                if hit_seen or not progressed:
                     break  # 本視窗沒有新節點可選了，拖曳地圖移動視窗。
-            # 視窗內沒有新節點 → 往右拖曳地圖。拖不動＝已到最右端，掃完。
-            if not _drag_map("right"):
-                MessageLog.print_message("[ARCARUM.SANDBOX] 已掃到地圖最右端，全圖掃描完成。")
+            # 這個視角一個新節點都沒選到就累計；連 4 個視角沒新東西＝
+            # 本輪掃完（端點 snap-back 讓拖曳永遠「成功」，不能只靠拖不動判終點；
+            # 之前設 3 太急，右端 pan 沒掃到就收工）。
+            if new_band_this_view:
+                stale_views = 0
+            else:
+                stale_views += 1
+                if stale_views >= 4:
+                    MessageLog.print_message("[ARCARUM.SANDBOX] 連續 4 個視角沒有新節點，本輪掃描結束。")
+                    break
+            # 視窗內沒有新節點 → 往前進方向平移地圖。若是重選到舊節點被拉
+            # 回來的，連續撞到幾次就多移幾步（上限 +2，移太多會跳過沒掃的
+            # 視角），逃出已掃描的區域。移不動＝到端點。
+            if hit_seen:
+                seen_streak += 1
+            drags = 1 + (min(seen_streak, 2) if hit_seen else 0)
+            moved_any = False
+            for _ in range(drags):
+                if _drag_map(forward):
+                    moved_any = True
+                else:
+                    break
+            dead_points.clear()  # 視角變了，黑名單座標基準失效。
+            if not moved_any:
+                MessageLog.print_message(f"[ARCARUM.SANDBOX] 已掃到地圖最{'右' if from_left else '左'}端，全圖掃描完成。")
                 break
         return False
 

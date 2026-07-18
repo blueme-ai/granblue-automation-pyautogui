@@ -68,6 +68,11 @@ def main():
         proc.stdout, proc.stderr = stdout, ""
         dt = int(time.time() - t0)
         out = (proc.stdout or "") + (proc.stderr or "")
+        # 每隻怪的完整輸出落地（診斷用；queue 主 log 只有摘要，沒有這個就看不到卡在哪）。
+        boss_log = os.path.join(os.path.dirname(SRC_TAURI), "logs",
+                                f"queue_boss_{i:02d}_{boss.lower().replace(' ', '_')}.log")
+        with open(boss_log, "w", encoding = "utf-8") as f:
+            f.write(out)
         farmed = out.count("Amount of items farmed") or None
         ok = proc.returncode == 0
         # 從輸出找戰鬥完成跡象
