@@ -190,6 +190,9 @@ GUI 設定「遊戲語言 → 日本語」後，圖像比對會優先使用
 定位、裁切並過濾掉語言通用的元件——完整步驟見
 [tools/jp_capture_flow.md](tools/jp_capture_flow.md)（工具：`tools/jp_ui_capture.py`）。
 
+**素材截圖 SOP**（如何用熱鍵連拍器抓原生像素截圖、為什麼 Telegram 照片不能裁模板）：
+[tools/capture_flow.md](tools/capture_flow.md)（工具：`tools/capture_helper.py`、`tools/template_check.py`）。
+
 ## 常見問題
 
 - **校準失敗**：確認遊戲視窗縮放 100%、底部 Home 鍵與返回鍵可見
