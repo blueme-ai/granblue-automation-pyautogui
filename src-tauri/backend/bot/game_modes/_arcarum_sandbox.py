@@ -659,6 +659,24 @@ class ArcarumSandbox:
             # 兩種氣泡對節點中心的幾何位置相同，共用同一組點擊偏移。
             bubbles = ImageUtils.find_all("arcarum_sandbox_node_battle", custom_confidence = 0.70)
             bubbles += ImageUtils.find_all("arcarum_sandbox_node_event", custom_confidence = 0.70)
+            # 有些節點「沒有任何氣泡」（run-0719 龍戰姬/火螯實測：其他 10 節點
+            # 有劍/獎章氣泡、這兩顆什麼都沒有→只認氣泡就永遠不會點它們）。
+            # 補一招：偵測節點的金環底座（下弧，不被怪物本體遮住），換算成
+            # 「偽氣泡」座標（真氣泡都在節點右上 ~(+45,-52)，換算到同一基準
+            # 就能沿用既有的點擊偏移/refresh/黑名單），與真氣泡去重。
+            # 環模板支援多變體（arcarum_mundus_node_ring*.jpg）：用戶情報——
+            # 圖示/底座配色會隨活動改變（如獎章氣泡事件），新外觀丟新模板檔即可。
+            import glob as _glob
+            import os as _os
+            rings = []
+            for _rp in _glob.glob(f"{ImageUtils._current_dir}/images/buttons/arcarum_mundus_node_ring*.jpg"):
+                _rn = _os.path.basename(_rp)[:-4]
+                rings += ImageUtils.find_all(_rn, custom_confidence = 0.65)
+            _s2 = ImageUtils._template_scale
+            for (rx, ry) in rings:
+                px, py = rx + int(40 * _s2), ry - int(52 * _s2)
+                if all(abs(px - bx) + abs(py - by) > 45 * _s2 for (bx, by) in bubbles):
+                    bubbles.append((px, py))
             return bubbles
 
         def _refresh_bubble(bx, by):
