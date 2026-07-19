@@ -594,10 +594,11 @@ class ArcarumSandbox:
 
         return None
 
-    # 每次掃描交替起點方向：pass 1 由左往右、pass 2 由右往左…
-    # 單輪掃描會被 stale 檢查提早收工（省時），遠端的 pan 只靠單向掃永遠
-    # 到不了（run-0912 實測 4 輪全從左端起步，右端節點一次都沒被檢查）。
-    _scan_from_left: bool = True
+    # 掃描輪次計數：起點方向逐輪交替（左→右→左…），平移方式每兩輪交替
+    # （箭頭→箭頭→拖曳→拖曳…）。箭頭平移量固定、視角可重現，但也因此有
+    # 「縫隙節點」——剛好每一頁都被裁在視窗邊緣、永遠點不到（run-0719 火螯/
+    # 龍戰姬 11/12 節點都檢查過就漏它們）；拖曳位移每次不同，正好錯開縫隙。
+    _scan_pass: int = 0
 
     @staticmethod
     def _mundus_scan(handle_selected) -> bool:
@@ -621,9 +622,11 @@ class ArcarumSandbox:
         import cv2
         _s = ImageUtils._template_scale
 
-        # 這一輪的起點端與前進方向（輪替）。
-        from_left = ArcarumSandbox._scan_from_left
-        ArcarumSandbox._scan_from_left = not from_left
+        # 這一輪的起點端、前進方向與平移方式（輪替）。
+        _pass = ArcarumSandbox._scan_pass
+        ArcarumSandbox._scan_pass += 1
+        from_left = (_pass % 2 == 0)
+        use_arrow = ((_pass // 2) % 2 == 0)
         start_side = "left" if from_left else "right"
         forward = "right" if from_left else "left"
 
@@ -741,7 +744,7 @@ class ArcarumSandbox:
             # 每次出來的畫面一致（用戶指正：拖曳每次位移都不同，視角不可
             # 重現，覆蓋與定位都不穩）。箭頭沒認到或點了沒位移（例如到端點
             # 箭頭消失/變灰）才退回滑鼠拖曳。回傳氣泡有沒有移動。
-            arrow = ImageUtils.find_button(f"arcarum_sandbox_{direction}_arrow", tries = 1, suppress_error = True)
+            arrow = ImageUtils.find_button(f"arcarum_sandbox_{direction}_arrow", tries = 1, suppress_error = True) if use_arrow else None
             if arrow is not None:
                 before = _find_bubbles()
                 MouseUtils.move_and_click_point(arrow[0], arrow[1], f"arcarum_sandbox_{direction}_arrow")
