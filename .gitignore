@@ -45,3 +45,8 @@ src-tauri/backend/log/
 results/
 logs/
 jp_capture/
+
+# Mundus 佇列工具的暫存/測試設定檔
+src-tauri/backend/queue_current.json
+src-tauri/backend/mundus_diag.json
+src-tauri/backend/mundus_test_*.json

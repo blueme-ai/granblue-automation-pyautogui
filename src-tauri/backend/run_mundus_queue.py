@@ -25,6 +25,18 @@ DEFAULT_BOSSES = [
 ]
 
 
+def _keep_awake(enable: bool):
+    """佇列執行期間防止螢幕鎖定/睡眠，結束時釋放。
+    （不能長駐：Modern Standby 筆電闔蓋自醒時會被殘留的 keep-awake 扣住整天不睡。）"""
+    import ctypes
+    ES_CONTINUOUS, ES_SYSTEM, ES_DISPLAY = 0x80000000, 0x00000001, 0x00000002
+    flags = ES_CONTINUOUS | (ES_SYSTEM | ES_DISPLAY if enable else 0)
+    try:
+        ctypes.windll.kernel32.SetThreadExecutionState(flags)
+    except Exception:
+        pass
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--rounds", type = int, default = 2)
@@ -36,6 +48,7 @@ def main():
     bosses = [b.strip() for b in args.bosses.split(",")] if args.bosses else DEFAULT_BOSSES
     base = json.load(open(BASE_SETTINGS, encoding = "utf-8"))
     results = []
+    _keep_awake(True)
 
     for i, boss in enumerate(bosses, 1):
         cfg = json.loads(json.dumps(base))
@@ -87,6 +100,7 @@ def main():
         results.append((boss, status, dt, err))
         print(f"  -> {status}  {dt}s  {err}", flush = True)
 
+    _keep_awake(False)
     print("\n===== 佇列總結 =====", flush = True)
     for boss, status, dt, err in results:
         print(f"{status:8s} {dt:5d}s  {boss}  {err}", flush = True)
@@ -95,4 +109,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        _keep_awake(False)  # 中斷（Ctrl+C/taskkill 前的例外）也要釋放，不能扣住機器

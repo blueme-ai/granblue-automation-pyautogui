@@ -88,6 +88,21 @@ src-tauri/backend/.venv/Scripts/pip install PySide6
   避免白耗 AAP。次數設高一點（例如 20）掛著刷。
 - **指定單刷**：關卡選特定一隻（例如「Herald of Water」）就只刷那一隻。
 
+#### 命令列佇列工具（免開 GUI）
+
+`src-tauri/backend/run_mundus_queue.py` 可以在命令列一次排多隻 Mundus 怪連刷：
+
+```
+cd src-tauri
+backend\.venv\Scripts\python.exe -X utf8 backend\run_mundus_queue.py --rounds 1 --lang jp
+```
+
+- 預設打 12 隻定點怪各 `--rounds` 場；`--bosses "A,B,C"` 可指定清單
+- 單隻超過 `--timeout`（預設 25 分鐘）會自動強制結束換下一隻
+- 執行期間自動防止螢幕鎖定／睡眠，結束自動釋放
+- 每隻怪的完整執行記錄存在 `logs/queue_boss_NN_名字.log`，總結印在最後
+- 設定範本是 `backend/jp_sweep_test.json`（遊戲語言、快速召喚等在這改）
+
 ## GUI 詳細操作說明
 
 介面分兩個分頁：**任務** 與 **設定**。右上角可切換介面語言（中文／English）。

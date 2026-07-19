@@ -18,8 +18,15 @@ class Settings:
         try:
             _file = open(f"{os.getcwd()}/settings.json")
         except FileNotFoundError:
-            print("[ERROR] Failed to find settings.json. Exiting now...")
-            sys.exit(1)
+            # cwd 不在 src-tauri 時（例如從別的目錄呼叫腳本）改用「本檔案
+            # 所在的 backend 目錄」找——import 時就 sys.exit 是偶發且難診斷
+            # 的坑；這裡讀到的只是預設值，真正的設定 main.py 稍後會用
+            # setpath 重新載入。
+            try:
+                _file = open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "settings.json"))
+            except FileNotFoundError:
+                print("[ERROR] Failed to find settings.json. Exiting now...")
+                sys.exit(1)
 
     _data = json.load(_file)
     _file.close()

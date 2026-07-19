@@ -134,36 +134,13 @@ class MouseUtils:
 
         from bot.game import Game
         if image_name == "attack" or image_name == "back" or image_name == "ok":
-            #obfuscate_click(maxclick=5)
             pyautogui.click(clicks = mouse_clicks)
-            try:
-                post = pyautogui.position()
-                with open('mouse.log','a') as f:
-                    f.write(str(post)+'\n')
-            except:
-                pass
-        
         else:
-            # 混淆点击
-            p = 15
-            R = random.randint(1,100)
-            if R >= p:
+            # 混淆點擊：15% 機率雙擊（防偵測，harjeb 遺留行為，保留）。
+            if random.randint(1, 100) >= 15:
                 pyautogui.click(clicks = mouse_clicks)
-                try:
-                    post = pyautogui.position()
-                    with open('mouse.log','a') as f:
-                        f.write(str(post)+'\n')
-                except:
-                    pass
             else:
                 pyautogui.click(clicks = 2)
-                try:
-                    post = pyautogui.position()
-                    with open('mouse.log','a') as f:
-                        f.write(str(post)+'\n')
-                        f.write(str(post)+'\n')
-                except:
-                    pass
         # 混淆移动
         #当前坐标
         #Game.wait(random.uniform(0.85, 1.79))
