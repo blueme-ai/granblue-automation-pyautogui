@@ -499,6 +499,28 @@ class ArcarumSandbox:
         """
         from bot.game import Game
 
+        # 原地續掃：畫面已經在 Mundus 地圖上（標題「エリア・ムンドゥス」在）就
+        # 不回大廳重進區。重進會把「目前選中的節點」重置——掃描開頭的
+        # 「已選中節點檢查」永遠落空，用戶手動幫忙點選目標節點的助攻也會被
+        # 洗掉（run-pwp 實錘）。The World 除外：它依賴 fresh entry 預設選中中央。
+        _rz_title = ImageUtils.find_button("arcarum_mundus_zone_title", tries = 2, suppress_error = True)
+        _rz_home = ImageUtils.find_button("home_menu", tries = 1, suppress_error = True)
+        # mission_go 箭頭＝底部面板有選中節點＝人在區域地圖上。這個模板在
+        # runtime 千錘百鍊（掃描每秒都在匹配它），比 zone_title 可靠——
+        # title 在探針腳本會中、進 bot 就 None 的原因未明（疑啟動前幾秒畫面
+        # 未穩），雙訊號擇一即可。
+        _rz_arrows = ImageUtils.find_all("arcarum_sandbox_mission_go", custom_confidence = 0.72)
+        MessageLog.print_message(f"[ARCARUM.SANDBOX] 原地續掃檢查：map={Settings.map_name!r} mission={Settings.mission_name!r} title={_rz_title} home={_rz_home} arrows={len(_rz_arrows)}")
+        if Settings.map_name == "Zone Mundus" and "The World" not in Settings.mission_name \
+                and _rz_home is not None and (_rz_title is not None or len(_rz_arrows) > 0):
+            MessageLog.print_message("[ARCARUM.SANDBOX] 已在 Zone Mundus 地圖上，原地續掃（不重進區、保留目前選中節點）。")
+            ArcarumSandbox._first_run = False
+            if Settings.mission_name == "Mundus Element Sweep":
+                ArcarumSandbox._navigate_mundus_element()
+            else:
+                ArcarumSandbox._navigate_mundus_target(Settings.mission_name)
+            return None
+
         if ArcarumSandbox._first_run:
             MessageLog.print_message(f"\n[ARCARUM.SANDBOX] Now beginning navigation to {Settings.map_name}...")
 
@@ -671,7 +693,12 @@ class ArcarumSandbox:
             rings = []
             for _rp in _glob.glob(f"{ImageUtils._current_dir}/images/buttons/arcarum_mundus_node_ring*.jpg"):
                 _rn = _os.path.basename(_rp)[:-4]
-                rings += ImageUtils.find_all(_rn, custom_confidence = 0.65)
+                # ring2＝火螯節點的白水晶怪「本體」（金環被怪物全遮、含背景的基座
+                # 裁片又會被翻頁視差搞掉分——只有高對比的怪物本體跨視角穩定：
+                # 真命中 0.85-1.0、雜訊叢集 ≤0.82，門檻 0.83 切開）。
+                # v1（通用金環下弧）真命中常只有 0.78 上下，維持 0.65。
+                _conf = 0.83 if _rn.endswith("ring2") else 0.65
+                rings += ImageUtils.find_all(_rn, custom_confidence = _conf)
             _s2 = ImageUtils._template_scale
             for (rx, ry) in rings:
                 px, py = rx + int(40 * _s2), ry - int(52 * _s2)
@@ -843,7 +870,9 @@ class ArcarumSandbox:
             # 重新偵測氣泡。已檢查過的節點用面板指紋跳過，避免無窮迴圈。
             hit_seen = False
             new_band_this_view = False
-            for _rescan in range(6):
+            # 8 輪：重選到已檢查節點（band_seen）與其後續 miss 現在都會各耗
+            # 一輪重偵測，6 輪會不夠把視角內所有候選輪完。
+            for _rescan in range(8):
                 bubbles = _find_bubbles()
                 # 靠近起點端的先點，確保節點在被視窗甩出邊界之前一定被檢查過。
                 bubbles.sort(key = lambda p: (p[0], p[1]), reverse = not from_left)
@@ -868,12 +897,14 @@ class ArcarumSandbox:
                         continue
                     arrows, band = result
                     if _band_seen(band):
-                        # 重選到已檢查過的節點：選中動作已經把地圖拉回置中它，
-                        # 視窗又彈回掃過的區域。不能當一般「沒進展」只拖一步——
-                        # 下一輪最左的氣泡又是它、又被拉回來，會永遠困在原地
-                        # （jp 佇列 boss1/2 各 25 分鐘死循環的主因）。跳出去
-                        # 用遞增步數拖曳逃離。
-                        hit_seen = True
+                        # 重選到已檢查過的節點：地圖已被拉回置中它、座標全過期
+                        # →只重偵測繼續掃「同一視角」剩下的候選，不跳出視角
+                        # （直接跳出會讓排在它右邊、還沒輪到的候選永遠餓死——
+                        # run-pincers2 實測火螯的基座偵測命中 72 次卻一次都沒
+                        # 被點到就是這樣）。它現在是「已選中節點」，下次再點到
+                        # 會因面板不變成為普通 miss 進黑名單，自然讓位。
+                        hit_seen = True  # 供視角結束時的拖曳步數升級判斷（保留）
+                        progressed = True
                         break
                     seen_bands.append(band)
                     seen_streak = 0
@@ -884,7 +915,7 @@ class ArcarumSandbox:
                         return True
                     progressed = True
                     break  # 地圖已因選中而移動，重新偵測氣泡再繼續。
-                if hit_seen or not progressed:
+                if not progressed:
                     break  # 本視窗沒有新節點可選了，拖曳地圖移動視窗。
             # 這個視角一個新節點都沒選到就累計；連 4 個視角沒新東西＝
             # 本輪掃完（端點 snap-back 讓拖曳永遠「成功」，不能只靠拖不動判終點；
