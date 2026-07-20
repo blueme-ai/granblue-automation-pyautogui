@@ -43,7 +43,20 @@ def main():
     ap.add_argument("--lang", default = "jp")
     ap.add_argument("--bosses", default = None, help = "逗號分隔；預設 12 隻定點怪")
     ap.add_argument("--timeout", type = int, default = 25, help = "單隻逾時（分鐘），逾時 taskkill 整棵樹")
-    args = ap.parse_args()
+    args, unknown = ap.parse_known_args()
+
+    # 修正：boss 名稱含空格且未加引號時，argparse 把空格後的 token 視為 unknown arguments。
+    # 把非選項（不以 '-' 開頭）的剩餘 token 用空格接回 --bosses 字串；
+    # 若有真正未知的選項（以 '-' 開頭）則仍報錯。
+    if unknown:
+        bad = [t for t in unknown if t.startswith("-")]
+        if bad:
+            ap.error(f"unrecognized arguments: {' '.join(bad)}")
+        extra = " ".join(unknown)
+        if args.bosses is not None:
+            args.bosses = args.bosses + " " + extra
+        else:
+            args.bosses = extra
 
     bosses = [b.strip() for b in args.bosses.split(",")] if args.bosses else DEFAULT_BOSSES
     base = json.load(open(BASE_SETTINGS, encoding = "utf-8"))
