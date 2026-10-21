@@ -121,7 +121,8 @@ class MouseUtils:
         # 精密小元素（翻頁箭頭、關卡「>」、量測過偏移的節點點擊）要點正中：
         # ±30% 模板尺寸的防偵測隨機化常落在可點區外（用戶實況觀察到
         # 「點在箭頭下面一點點」「點節點差一點點」就是它）。
-        if "arrow" in image_name or image_name in ("arcarum_mission_go", "arcarum_sandbox_mission_go", "arcarum_mundus_node"):
+        precise = "arrow" in image_name or image_name in ("arcarum_mission_go", "arcarum_sandbox_mission_go", "arcarum_mundus_node")
+        if precise:
             new_x, new_y = x, y
         else:
             new_x, new_y = MouseUtils._randomize_point(x, y, image_name)
@@ -134,6 +135,11 @@ class MouseUtils:
 
         from bot.game import Game
         if image_name == "attack" or image_name == "back" or image_name == "ok":
+            pyautogui.click(clicks = mouse_clicks)
+        elif precise:
+            # 精密元素一律單擊：Mundus 地圖點節點會觸發置中平移，雙擊的第二下
+            # 落在平移後的位置＝點到隔壁節點或資訊氣泡；關卡「>」被雙擊則可能
+            # 點到換頁後出現在同位置的按鈕。長時間跑「偶爾點錯幾個節點」就是這 15%。
             pyautogui.click(clicks = mouse_clicks)
         else:
             # 混淆點擊：15% 機率雙擊（防偵測，harjeb 遺留行為，保留）。
